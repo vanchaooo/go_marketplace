@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"slices"
-	"github.com/vanchaooo/go-marketplace/balance_action"
+	// "github.com/vanchaooo/go-marketplace/balance_action"
 )
 
 func AddUser(users map[int]string, balances map[int]int, id int, name string) bool {
@@ -24,7 +24,7 @@ func AddUser(users map[int]string, balances map[int]int, id int, name string) bo
 		return false
 	} else {
 		users[id] = name
-		balance_action.TopUpBalance(users, balances, id, 0)
+		balances[id] = 0
 		return true
 	}
 }

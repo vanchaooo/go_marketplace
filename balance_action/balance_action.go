@@ -16,13 +16,12 @@ amount int,
 		return false
 	}
 
-	if amount < 0 {
-		fmt.Println(errors.New("Amount can't be negative."))
+	if amount <= 0 {
+		fmt.Println(errors.New("Amount can't be negative or zero."))
 		return false
 	}
 
 	balances[userID] += amount
-
 	return true
 }
 
