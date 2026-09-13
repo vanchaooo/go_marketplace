@@ -1,13 +1,23 @@
-package balance_action
+package balance
 
 import (
 	"fmt"
 	"errors"
 )
 
+var (
+	Balances = map[int]int{
+		1: 0,
+		2: 0,
+		3: 0,
+		4: 0,
+		5: 0,
+		6: 0,
+	}
+)
+
 func TopUpBalance(
 users map[int]string,
-balances map[int]int,
 userID int,
 amount int,
 ) bool {
@@ -21,13 +31,20 @@ amount int,
 		return false
 	}
 
-	balances[userID] += amount
+	Balances[userID] += amount
 	return true
+}
+
+func GetEveryoneBalance() {
+	for k, v := range Balances {
+		rubles := v / 100
+		kopecks := v % 100
+		fmt.Printf("ID: %d, Баланс: %d рублей %d копеек.\n", k, rubles, kopecks)
+	}
 }
 
 func GetBalance(
 users map[int]string,
-balances map[int]int,
 userID int,
 ) (int, bool) {
 	if _, ok := users[userID]; !ok {
@@ -35,10 +52,10 @@ userID int,
 		return 0, false
 	}
 
-	rubles := balances[userID] / 100
-	kopecks := balances[userID] % 100
+	rubles := Balances[userID] / 100
+	kopecks := Balances[userID] % 100
 
 	fmt.Printf("Пользователь (ID): %d. Баланс: %d рублей %d копеек\n", userID, rubles, kopecks)
-	result, ok := balances[userID]
+	result, ok := Balances[userID]
 	return result, ok
 }

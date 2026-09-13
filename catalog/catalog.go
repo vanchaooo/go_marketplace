@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	catalog = map[string]map[string]int {
-		"Смартфоны": {
-			"iPhone 15": 49900,
+	Catalog = map[string]map[string]int {
+		"Телефоны": {
+			"iPhone 15": 49990,
 			"Samsung S24": 75000,
 			"Xiaomi 14":  40000,
 		}, 
@@ -34,34 +34,36 @@ var (
 			"Датчик Aqara Hub": 35100,
 		},
 	}
-
-	bucket = make(map[string]int)
 )
 
 func GetCatalog() {
-	for _, v := range catalog {
+	fmt.Println("---------------------------------------------")
+	for k, v := range Catalog {
+		fmt.Println("Категория:", k)
+		fmt.Println()
 		for sk, sv := range v {
 			fmt.Printf("Товар: %s | Цена: %d\n", sk, sv)
 		}
+		fmt.Println("---------------------------------------------")
 	}
 }
 
-func AddToBucket(category string, device string) bool {
-		if category == "" || device == "" {
-			fmt.Println(errors.New("Name can't be empty."))
-			return false
-		}
-
-		bucket[device] = catalog[category][device]
-		return true
-}
-
-func DeleteFromBucket(position string) bool {
-	if position == "" {
+func AddNewSection(name string, position map[string]int) bool {
+	if name == "" {
 		fmt.Println(errors.New("Name can't be empty."))
 		return false
 	}
 
-	delete(bucket, position)
+	Catalog[name] = position
+	return true
+}
+
+func AddNewPosition(section string, position string, price int) bool {
+	if section == "" || position == "" {
+		fmt.Println(errors.New("Name can't be empty."))
+		return false
+	}
+
+	Catalog[section][position] = price
 	return true
 }
