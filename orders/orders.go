@@ -20,6 +20,7 @@ func Order(position string) bool {
 		fmt.Println(errors.New("Неверное наименование товара."))
 		return false
 	}
+	
 
 	if _, ok := cart.Cart[position]; ok {
 		fmt.Printf("Заказ успешно оформлен! Товар %s был удален из корзины и перемещен в заказы.\n", position)
@@ -28,7 +29,7 @@ func Order(position string) bool {
 		delete(cart.Cart, position)
 		return true
 	} else {
-		fmt.Printf("В вашей корзине нету %s.\n", position)
+		fmt.Printf("Не удалось найти %s в корзине.\n", position)
 		return false
 	}
 }

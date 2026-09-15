@@ -6,7 +6,7 @@ import (
 	// "github.com/vanchaooo/go-marketplace/balance"
 	"github.com/vanchaooo/go-marketplace/catalog"
 	"github.com/vanchaooo/go-marketplace/cart"
-	"github.com/vanchaooo/go-marketplace/orders"
+	// "github.com/vanchaooo/go-marketplace/orders"
 )
 
 func main() {
@@ -24,12 +24,7 @@ func main() {
 	// fmt.Println("============================================================")
 	// fmt.Println()
 
-
-	new_section := map[string]int{
-		"Игровой стол": 33990,
-	}
-
-	catalog.AddNewSection("Столы", new_section)
+	catalog.AddNewSection("Столы")
 	catalog.AddNewPosition("Столы", "Стол с механизмом подъема", 45000)
 	catalog.GetCatalog()
 
@@ -37,19 +32,26 @@ func main() {
 	fmt.Println("============================================================")
 	fmt.Println()
 
-	cart.AddToCart("Аудио", "AirPods Pro 2")
-	cart.AddToCart("Телефоны", "iPhone 15")
-	cart.AddToCart("Столы", "Игровой стол")
+	cart.AddToCart("Аудио", "AirPods Pro 2", 1)
+	cart.AddToCart("Телефоны", "iPhone 15", 2)
+	cart.AddToCart("Умный дом", "Яндекс Станция Макс", 4)
+	fmt.Println()
+	cart.GetCart()
+	fmt.Println()
+	cart.ReduceQuantity("AirPods Pro 2")
+	cart.ReduceQuantity("Яндекс Станция Макс")
+	cart.AddQuantity("iPhone 15")
+	fmt.Println()
 	cart.GetCart()
 
-	fmt.Println()
-	fmt.Println("============================================================")
-	fmt.Println()
+	// fmt.Println()
+	// fmt.Println("============================================================")
+	// fmt.Println()
 
-	orders.Order("AirPods Pro 2")
-	orders.Order("iPhone 15")
-	orders.GetAllOrders()
-	orders.CancelOrder("iPhone 15")
-	orders.GetAllOrders()
-	orders.OrdersHistory()
+	// orders.Order("AirPods Pro 2")
+	// orders.Order("iPhone 15")
+	// orders.GetAllOrders()
+	// orders.CancelOrder("iPhone 15")
+	// orders.GetAllOrders()
+	// orders.OrdersHistory()
 }
