@@ -16,16 +16,10 @@ var (
 	}
 )
 
-func TopUpBalance(
-users map[int]string,
+func SetBalance(
 userID int,
 amount int,
 ) bool {
-	if _, ok := users[userID]; !ok {
-		fmt.Println(errors.New("User does not exsist."))
-		return false
-	}
-
 	if amount <= 0 {
 		fmt.Println(errors.New("Amount can't be negative or zero."))
 		return false

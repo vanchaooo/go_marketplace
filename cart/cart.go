@@ -8,8 +8,17 @@ import (
 
 var (
 	Cart = map[string]map[int]int{}
-	Quantity = 0
 )
+
+// func get_quantity() int {
+// 	count := 0 
+// 	for _, v := range Cart {
+// 		for _, amount := range v {
+// 			count += amount
+// 		}
+// 	}
+// 	return count
+// }
 
 
 // Добавление товара в корзину
@@ -36,7 +45,6 @@ func AddToCart(category string, position string, product_quantity int) bool {
 			Cart[position] = map[int]int {
 				price: product_quantity,
 			}
-			Quantity += product_quantity
 
 			fmt.Printf("%s успешно добавлен в корзину!\n", position)
 			return true
@@ -52,12 +60,12 @@ func AddToCart(category string, position string, product_quantity int) bool {
 func GetCart() {
 	total := 0
     for _, product := range Cart {
-        for price, quantity := range product {
-            total += price * quantity
+        for price, amount := range product {
+            total += price * amount
         }
     }
 
-	fmt.Printf("В корзине %d предметов на %d рублей: ", Quantity, total)
+	fmt.Printf("В корзине %d предметов на %d рублей: ", get_quantity(), total)
 	fmt.Println()
 	for k, v := range Cart {
 		for price, stock := range v {
@@ -99,7 +107,6 @@ func ReduceQuantity(position string) bool {
 				return true
 			}
 		}
-		Quantity--
 		fmt.Printf("Количество %q успешно уменьшено на 1 шт.\n", position)
 		return true
 	}
@@ -109,7 +116,7 @@ func ReduceQuantity(position string) bool {
 }
 
 
-// Добавление количества товара в корзине
+// Увеличение количества товара в корзине
 func AddQuantity(position string) bool {
 	if position == "" {
 		fmt.Println(errors.New("Пожалуйста, проверьте, заполнили ли вы поля."))
@@ -118,15 +125,13 @@ func AddQuantity(position string) bool {
 
 	product, ok := Cart[position]
 	if ok {
-
-		for price, stock := range product {
-			Cart[position] = map[int]int {
-				price: stock+1,
+			for price, stock := range product {
+				Cart[position] = map[int]int {
+					price: stock+1,
+				}
 			}
-		}
-		Quantity++
-		fmt.Printf("Количество %q успешно увеличено на 1 шт.\n", position)
-		return true
+			fmt.Printf("Количество %q успешно увеличено на 1 шт.\n", position)
+			return true
 	}
 
 	fmt.Println("Не удалось увеличить количество товара.")

@@ -21,15 +21,23 @@ var (
 	count = len(Users_list)+1
 )
 
-func AddUser(name string) bool {
+func UserExists(userID int) bool {
+	if _, ok := Users_list[userID]; !ok {
+		fmt.Println(errors.New("User does not exsist."))
+		return false
+	} else {
+		return true
+	}
+}
+
+func AddUser(name string) int {
 	if name == "" {
 		fmt.Println(errors.New("Name can't be empty."))
-		return false
+		return 0
 	}
 
 	Users_list[count] = name
-	balance.Balances[count] = 0
-	return true
+	return count
 }
 
 func GetUser(id int) (string, bool) {
