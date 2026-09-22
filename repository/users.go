@@ -28,6 +28,15 @@ var Users = map[int]*User{
 	15: {ID: 15, Name: "Николай"},
 }
 
+func UserExists(userID int) bool {
+	if _, ok := Users[userID]; !ok {
+		fmt.Println(errors.New("Не удалось найти пользователя с таким ID."))
+		return false
+	} else {
+		return true
+	}
+}
+
 func AddUser(user *User) {
 	if user.Name == "" {
 		fmt.Println(errors.New("Имя пользователя не может быть пустым."))
@@ -35,7 +44,6 @@ func AddUser(user *User) {
 
 	user.ID = len(Users)+1
 	Users[user.ID] = user
-	Balances[user.ID] = 0
 }
 
 func GetAllUsers() {
@@ -68,7 +76,6 @@ func DeleteUser(id int) bool {
 	if _, ok := Users[id]; ok {
 		fmt.Println("Пользователь успешно удален.")
 		delete(Users, id)
-		delete(Balances, id)
 		return true
 	}
 	

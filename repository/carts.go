@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 	"errors"
+	"slices"
 )
 
 type Item struct {
@@ -11,28 +12,42 @@ type Item struct {
 	Amount int
 }
 
-var Cart = map[int]*Item {}
+var Cart = map[int][]*Item {}
 
 func GetQuantity() int {
 	count := 0
-	for _, v := range Cart{
-		count += v.Amount
+	for _, v := range Cart {
+		for _, j := range v {
+			count += j.Amount
+		}
 	}
 	return count
 }
 
-func GetAllCart() {
-	fmt.Printf("Корзина %d:\n", GetQuantity())
+func GetCart(userID int) bool {
+	if userID == 0 {
+		fmt.Println(errors.New("Введите ваш ID."))
+		return false
+	}
+
+	total := 0
 	summ := 0
-	for k, v := range Cart {
-		fmt.Printf("%d. Товар: %q,  Цена: %d, Количество: %d.\n", k, v.Name, v.Price, v.Amount)
+	fmt.Printf("Корзина пользователя %d:\n", userID)
+	for _, v := range Cart[userID] {
+		fmt.Printf("Товар %q, Цена: %d, Количество: %d.\n", v.Name, v.Price, v.Amount)
+		total += v.Amount
 		summ += v.Price
 	}
 	fmt.Println()
-	fmt.Printf("Итого: %d\n", summ)
+	fmt.Printf("Товаров - %d.\nОбщая сумма товаров - %d.\n", total, summ)
+	return true
 }
 
-func AddToCart(product string, amount int) bool {
+func AddToCart(userID int, product string) bool {
+	if userID == 0 {
+		fmt.Println(errors.New("Введите ваш ID."))
+		return false
+	}
 	if product == "" {
 		fmt.Println(errors.New("Название товара не может быть пустым."))
 		return false
@@ -42,12 +57,11 @@ func AddToCart(product string, amount int) bool {
 		if v.Name == product {
 			addprod := &Item{
 				Name: v.Name,
-				Price: v.Price * amount,
-				Amount: amount,
+				Price: v.Price,
+				Amount: 1,
 			}
-			fmt.Printf("%q успешно добавлен в корзину.\n", product)
-			newPosition := len(Cart)+1
-			Cart[newPosition] = addprod
+			fmt.Printf("%q добавлен в корзину.\n", product)
+			Cart[userID] = append(Cart[userID], addprod)
 			return true
 		}
 	}
@@ -56,11 +70,11 @@ func AddToCart(product string, amount int) bool {
 	return false
 }
 
-func DeteleFromCart(product string) bool {
-	for k, v := range Cart {
-		if v.Name == product {
-			fmt.Printf("%q успешно удален из корзины.\n", product)
-			delete(Cart, k)
+func DeleteFromCart(userID int, product string) bool {
+	for k, j := range Cart[userID] {
+		if j.Name == product {
+			fmt.Printf("%q удален из корзины.\n", product)
+			Cart[userID] = slices.Delete(Cart[userID], k, k+1)
 			return true
 		}
 	}
@@ -69,20 +83,20 @@ func DeteleFromCart(product string) bool {
 	return false
 }
 
-func AddAmount(product string) bool {
+func AddAmount(userID int, product string) bool {
 	if product == "" {
 		fmt.Println(errors.New("Название товара не может быть пустым."))
 	}
 
-	for _, v := range Cart {
-		if v.Name == product {
-			v.Amount++
+	for _, j := range Cart[userID] {
+		if j.Name == product {
+			j.Amount++
 			for _, check := range Catalog {
 				if check.Name == product {
-					v.Price += check.Price
+					j.Price += check.Price
 				}
 			}
-			fmt.Println("Количество успешно увеличино на 1.")
+			fmt.Printf("%q увеличен на 1.\n", product)
 			return true
 		}
 	}
@@ -91,21 +105,27 @@ func AddAmount(product string) bool {
 	return false
 }
 
-func LowerAmount(product string) bool {
+func LowerAmount(userID int, product string) bool {
 	if product == "" {
 		fmt.Println(errors.New("Название товара не может быть пустым."))
 	}
 
-	for _, v := range Cart {
-		if v.Name == product {
-			v.Amount--
-			for _, check := range Catalog {
-				if check.Name == product {
-					v.Price -= check.Price
+	for k, j := range Cart[userID] {
+		if j.Name == product {
+			if j.Amount > 1 {
+				j.Amount--
+				for _, check := range Catalog {
+					if check.Name == product {
+						j.Price -= check.Price
+					}
 				}
+				fmt.Printf("%q уменьшен на 1.\n", product)
+				return true
+			} else {
+				Cart[userID] = slices.Delete(Cart[userID], k, k+1)
+				fmt.Printf("%q удален из корзины.\n", product)
+				return true
 			}
-			fmt.Println("Количество успешно уменьшено на 1.")
-			return true
 		}
 	}
 

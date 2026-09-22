@@ -2,13 +2,40 @@ package main
 
 import (
 	"fmt"
-	"github.com/vanchaooo/go-marketplace/repository"
+	"github.com/vanchaooo/go-marketplace/service"
 )
 
 func main() {
-	repository.AddToCart("Кожаный кошелек", 10)
-	repository.AddToCart("Ноутбук для работы 15.6", 1)
+	fmt.Println("======================================")
 	fmt.Println()
-	repository.GetAllCart()
 	
+	service.AddToCart(9, "Ноутбук для работы 15.6")
+	service.AddAmount(9, "Ноутбук для работы 15.6")
+
+	fmt.Println()
+	fmt.Println("======================================")
+	fmt.Println()
+
+	service.CheckCart(9)
+
+	fmt.Println()
+	fmt.Println("======================================")
+	fmt.Println()
+
+	service.UpdateBalance(9, 200000)
+
+	fmt.Println()
+	fmt.Println("======================================")
+	fmt.Println()
+
+	service.Order(9, "Ноутбук для работы 15.6")
+
+	fmt.Println()
+	fmt.Println("======================================")
+	fmt.Println()
+
+	service.CheckOrdersHistory(9)
+
+	fmt.Println()
+	fmt.Println("======================================")
 }
