@@ -1,14 +1,15 @@
 package repository
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 	"slices"
+
+	"github.com/vanchaooo/go-marketplace/repository"
 )
 
 type Item struct {
-	Name string
-	Price int
+	ProductID int
 	Amount int
 }
 
@@ -43,32 +44,34 @@ func GetCart(userID int) bool {
 	return true
 }
 
-func AddToCart(userID int, product string) bool {
+func AddToCart(userID int, productID int) bool {
 	if userID == 0 {
 		fmt.Println(errors.New("Введите ваш ID."))
 		return false
 	}
-	if product == "" {
-		fmt.Println(errors.New("Название товара не может быть пустым."))
+	product := repository.GetProduct(productID)
+	if !product {
 		return false
 	}
 
-	for _, v := range Catalog {
-		if v.Name == product {
-			addprod := &Item{
-				Name: v.Name,
-				Price: v.Price,
-				Amount: 1,
-			}
-			fmt.Printf("%q добавлен в корзину.\n", product)
-			Cart[userID] = append(Cart[userID], addprod)
+
+	for _, v := range Cart[userID] {
+		if v.ProductID == productID {
+			AddAmount(userID, productID)
 			return true
 		}
 	}
 
-	fmt.Printf("Не удалось найти %q в каталоге товаров.", product)
-	return false
+	addprod := &Item {
+		ProductID: productID,
+		Amount: 1,
+	}
+	fmt.Printf("%q добавлен в корзину.\n", product)
+	Cart[userID] = append(Cart[userID], addprod)
+	return true
 }
+
+// ===================================== Переделать все по ID =================================================== 
 
 func DeleteFromCart(userID int, product string) bool {
 	for k, j := range Cart[userID] {
@@ -83,7 +86,7 @@ func DeleteFromCart(userID int, product string) bool {
 	return false
 }
 
-func AddAmount(userID int, product string) bool {
+func AddAmount(userID int, productID int) bool {
 	if product == "" {
 		fmt.Println(errors.New("Название товара не может быть пустым."))
 	}

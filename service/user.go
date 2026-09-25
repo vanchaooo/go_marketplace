@@ -2,15 +2,10 @@ package service
 
 import (
 	"fmt"
-	"errors"
 	"github.com/vanchaooo/go-marketplace/repository"
 )
 
 func RegisterUser(name string) {
-	if name == "" {
-		fmt.Println(errors.New("Имя пользователя не может быть пустым."))
-	}
-
 	strct := &repository.User{
 		Name: name,
 	}

@@ -106,13 +106,13 @@ func GetCatalog() {
 	}
 }
 
-func GetProduct(id int) (*Product, bool) {
+func GetProduct(id int) *Product {
 	if product, ok := Catalog[id]; ok {
 		fmt.Printf("ID: %d || Товар: %s, Цена: %d, Кол-во на складе: %d шт.\n", product.ID, product.Name, product.Price, product.Stock)
-		return product, ok
+		return product
 	} else {
 		fmt.Println(errors.New("С таким ID, товара не найдено."))
-		return nil, false
+		return nil
 	}
 }
 

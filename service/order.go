@@ -11,7 +11,8 @@ func Order(userID int, position string) bool {
 		for _, v := range repository.Cart[userID] {
 			if v.Name == position {
 				sum := v.Price
-				if repository.Balances[userID] >= sum {
+				balance, _ := repository.GetBalance(userID)
+				if balance >= sum {
 					tovar := &repository.Position{
 						Name: v.Name,
 						Price: v.Price,
