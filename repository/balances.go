@@ -5,7 +5,7 @@ import (
 	"errors"
 )
 
-var Balances = map[int]int{
+var balances = map[int]int{
 	1: 0,
 	2: 0,
 	3: 0,
@@ -24,57 +24,29 @@ var Balances = map[int]int{
 }
 
 func CreateBalance(userID int) {
-	Balances[userID] = 0
+	balances[userID] = 0
 }
 
 func GetEveryoneBalance() {
-	for k, v := range Balances {
+	for k, v := range balances {
 		fmt.Printf("ID: %d, Баланс: %d\n", k, v)
 	}
 }
 
 func GetBalance(userID int) (int, bool) {
-	if balance, ok := Balances[userID]; ok {
-		if userID <= 0 {
-			fmt.Println(errors.New("ID Пользователя не может быть меньше 0."))
-			return 0, false
-		}
-
-		fmt.Printf("ID пользователя: %d. Баланс: %d", userID, balance)
-		return balance, ok
-	} else {
-		fmt.Println(errors.New("Не удалось найти пользователя с таким ID."))
-		return 0, false
-	}
-}
-
-func SetBalance(userID int, balance int) bool {
-	if _, ok := Balances[userID]; ok {
-		if userID <= 0 {
-			fmt.Println(errors.New("ID Пользователя не может быть меньше 0."))
-			return false
-		}
-		if balance <= 0 {
-			fmt.Println(errors.New("Устанавливаемый баланс не может быть меньше 0."))
-			return false
-		}
-
-		Balances[userID] = balance
-		return true
+	if UserExists(userID) {
+		fmt.Printf("ID пользователя: %d. Баланс: %d", userID, balances[userID])
+		return balances[userID], true
 	}
 
-	fmt.Println(errors.New("ПОльзователь с таким ID не найден."))
-	return false
+	fmt.Println(errors.New("Не удалось найти пользователя с таким ID."))
+	return 0, false
 }
 
 func DeleteBalance(userID int) bool {
-	if _, ok := Balances[userID]; ok {
-		if userID <= 0 {
-			fmt.Println(errors.New("ID Пользователя не может быть меньше 0."))
-			return false
-		}
-
-		delete(Balances, userID)
+	if UserExists(userID) {
+		delete(balances, userID)
+		fmt.Println("Баланс удален.")
 		return true
 	}
 
@@ -83,43 +55,38 @@ func DeleteBalance(userID int) bool {
 }
 
 func LowerBalance(userID int, balance int) bool {
-	if _, ok := Balances[userID]; ok {
-		if userID <= 0 {
-			fmt.Println(errors.New("ID Пользователя не может быть меньше 0."))
+	if UserExists(userID) {
+		if balance == 0 {
+			fmt.Println(errors.New("Сумма не может быть равна 0"))
 			return false
 		}
-		if balance <= 0 {
-			fmt.Println(errors.New("Устанавливаемый баланс не может быть меньше 0."))
-			return false
+		if balance >= balances[userID] {
+			DeleteBalance(userID)
 		}
 
-		Balances[userID] -= balance
+		balances[userID] -= balance
 		fmt.Printf("Баланс уменьшен на %d рублей.\n", balance)
-		fmt.Printf("Текущий баланс: %d.\n", Balances[userID])
+		fmt.Printf("Текущий баланс: %d\n", balances[userID])
 		return true
 	}
 
-	fmt.Println(errors.New("ПОльзователь с таким ID не найден."))
+	fmt.Println(errors.New("Ошибка."))
 	return false
 }
 
 func HigherBalance(userID int, balance int) bool {
-	if _, ok := Balances[userID]; ok {
-		if userID <= 0 {
-			fmt.Println(errors.New("ID Пользователя не может быть меньше 0."))
-			return false
-		}
-		if balance <= 0 {
-			fmt.Println(errors.New("Устанавливаемый баланс не может быть меньше 0."))
+	if UserExists(userID) {
+		if balance == 0 {
+			fmt.Println(errors.New("Сумма не может быть равна 0."))
 			return false
 		}
 
-		Balances[userID] += balance
-		fmt.Printf("Баланс пополнен на %d рублей.\n", balance)
-		fmt.Printf("Текущий баланс: %d.\n", Balances[userID])
+		balances[userID] += balance
+		fmt.Printf("Баланс увеличен на %d рублей.\n", balance)
+		fmt.Printf("Текущий баланс: %d\n", balances[userID])
 		return true
 	}
 
-	fmt.Println(errors.New("ПОльзователь с таким ID не найден."))
+	fmt.Println(errors.New("Ошибка."))
 	return false
 }

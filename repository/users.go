@@ -10,7 +10,7 @@ type User struct {
 	Name string
 }
 
-var Users = map[int]*User{
+var users = map[int]*User{
 	1:  {ID: 1, Name: "Иван"},
 	2:  {ID: 2, Name: "Мария"},
 	3:  {ID: 3, Name: "Алексей"},
@@ -29,7 +29,7 @@ var Users = map[int]*User{
 }
 
 func UserExists(userID int) bool {
-	if _, ok := Users[userID]; !ok {
+	if _, ok := users[userID]; !ok {
 		fmt.Println(errors.New("Не удалось найти пользователя с таким ID."))
 		return false
 	} else {
@@ -42,12 +42,12 @@ func AddUser(user *User) {
 		fmt.Println(errors.New("Имя пользователя не может быть пустым."))
 	}
 
-	user.ID = len(Users)+1
-	Users[user.ID] = user
+	user.ID = len(users)+1
+	users[user.ID] = user
 }
 
 func GetAllUsers() {
-	for _, v := range Users {
+	for _, v := range users {
 		fmt.Printf("ID: %d, Имя: %s.\n", v.ID, v.Name)
 	}
 }
@@ -58,7 +58,7 @@ func GetUser(id int) (*User, bool) {
 		return nil, false
 	}
 	
-	if user, ok := Users[id]; ok {
+	if user, ok := users[id]; ok {
 		fmt.Printf("По такому ID был найден: %q.\n", user.Name)
 		return user, ok
 	}
@@ -73,9 +73,9 @@ func DeleteUser(id int) bool {
 		return false
 	}
 
-	if _, ok := Users[id]; ok {
+	if _, ok := users[id]; ok {
 		fmt.Println("Пользователь успешно удален.")
-		delete(Users, id)
+		delete(users, id)
 		return true
 	}
 	

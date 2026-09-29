@@ -13,7 +13,7 @@ type Product struct {
 	Stock int
 }
 
-var Catalog = map[int]*Product{
+var catalog = map[int]*Product{
 	// --- 📱 Электроника и Гаджеты (1-8) ---
 	1: {ID: 1, Name: "Смартфон Флагман 256GB", Price: 89990, Stock: rand.IntN(1000)},
 	2: {ID: 2, Name: "Беспроводные наушники ANC", Price: 14990, Stock: rand.IntN(1000)},
@@ -82,7 +82,7 @@ var Catalog = map[int]*Product{
 }
 
 func AddProduct(product *Product) bool {
-	product.ID = len(Catalog)+1
+	product.ID = len(catalog)+1
 	if product.Name == "" {
 		fmt.Println(errors.New("Имя товара не может быть пустым!"))
 		return false
@@ -96,29 +96,29 @@ func AddProduct(product *Product) bool {
 		return false
 	}
 
-	Catalog[product.ID] = product
+	catalog[product.ID] = product
 	return true
 }
 
 func GetCatalog() {
-	for _, v := range Catalog {
+	for _, v := range catalog {
 		fmt.Printf("ID: %d, Товар: %s, Цена: %d, В наличии: %d шт.\n", v.ID, v.Name, v.Price, v.Stock)
 	}
 }
 
-func GetProduct(id int) *Product {
-	if product, ok := Catalog[id]; ok {
+func GetProduct(id int) (*Product, bool) {
+	if product, ok := catalog[id]; ok {
 		fmt.Printf("ID: %d || Товар: %s, Цена: %d, Кол-во на складе: %d шт.\n", product.ID, product.Name, product.Price, product.Stock)
-		return product
+		return product, true
 	} else {
 		fmt.Println(errors.New("С таким ID, товара не найдено."))
-		return nil
+		return nil, false
 	}
 }
 
 func DeleteProduct(id int) {
-	if _, ok := Catalog[id]; ok {
-		delete(Catalog, id)
+	if _, ok := catalog[id]; ok {
+		delete(catalog, id)
 	} else {
 		fmt.Println(errors.New("С таким ID, товара не найдено."))
 	}

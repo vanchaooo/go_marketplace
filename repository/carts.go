@@ -1,11 +1,11 @@
 package repository
 
 import (
-	"errors"
+	// "errors"
 	"fmt"
 	"slices"
-
-	"github.com/vanchaooo/go-marketplace/repository"
+	// "string"
+	// "strings"
 )
 
 type Item struct {
@@ -14,6 +14,19 @@ type Item struct {
 }
 
 var Cart = map[int][]*Item {}
+
+func TotalSum(userID int) int {
+	if UserExists(userID) {
+		sum := 0
+		for _, v := range Cart[userID] {
+			prod, _ := GetProduct(v.ProductID)
+			sum += prod.Price * v.Amount
+			return sum
+		}
+	}
+
+	return 0
+}
 
 func GetQuantity() int {
 	count := 0
@@ -26,112 +39,118 @@ func GetQuantity() int {
 }
 
 func GetCart(userID int) bool {
-	if userID == 0 {
-		fmt.Println(errors.New("Введите ваш ID."))
-		return false
+	if UserExists(userID) {
+		total := 0
+		summ := 0
+
+		fmt.Printf("Корзина пользователя %d:\n", userID)
+		for _, v := range Cart[userID] {
+			product, ok := GetProduct(v.ProductID)
+			if ok {
+				fmt.Printf("Товар %q, Цена: %d, Количество: %d.\n", product.Name, product.Price, v.Amount)
+				total += v.Amount
+				summ += product.Price * v.Amount
+			} else {
+				fmt.Printf("Товар с ID %d не найден.\n", v.ProductID)
+			}
+		}
+		fmt.Println()
+		fmt.Printf("Товаров - %d.\nОбщая сумма товаров - %d.\n", total, summ)
+		return true
 	}
 
-	total := 0
-	summ := 0
-	fmt.Printf("Корзина пользователя %d:\n", userID)
-	for _, v := range Cart[userID] {
-		fmt.Printf("Товар %q, Цена: %d, Количество: %d.\n", v.Name, v.Price, v.Amount)
-		total += v.Amount
-		summ += v.Price
-	}
-	fmt.Println()
-	fmt.Printf("Товаров - %d.\nОбщая сумма товаров - %d.\n", total, summ)
-	return true
+	fmt.Printf("Не удалось найти пользователя с таким ID.")
+	return false
 }
 
 func AddToCart(userID int, productID int) bool {
-	if userID == 0 {
-		fmt.Println(errors.New("Введите ваш ID."))
-		return false
-	}
-	product := repository.GetProduct(productID)
-	if !product {
-		return false
-	}
+	product, ok := GetProduct(productID)
+	if UserExists(userID) {
+		if productID == 0 {
+			fmt.Println("ID товара не может быть равно 0.")
+			return false
+		}
+		if ok {
+			for _, v := range Cart[userID] {
+				if v.ProductID == productID {
+					AddAmount(userID, productID)
+					return true
+				}
+			}
 
-
-	for _, v := range Cart[userID] {
-		if v.ProductID == productID {
-			AddAmount(userID, productID)
+			addprod := &Item {
+				ProductID: productID,
+				Amount: 1,
+			}
+			fmt.Printf("%q добавлен в корзину.\n", product)
+			Cart[userID] = append(Cart[userID], addprod)
 			return true
 		}
 	}
 
-	addprod := &Item {
-		ProductID: productID,
-		Amount: 1,
-	}
-	fmt.Printf("%q добавлен в корзину.\n", product)
-	Cart[userID] = append(Cart[userID], addprod)
-	return true
+	fmt.Printf("Не удалось найти %q в каталоге товаров.")
+	return false
 }
 
-// ===================================== Переделать все по ID =================================================== 
-
-func DeleteFromCart(userID int, product string) bool {
-	for k, j := range Cart[userID] {
-		if j.Name == product {
-			fmt.Printf("%q удален из корзины.\n", product)
-			Cart[userID] = slices.Delete(Cart[userID], k, k+1)
-			return true
+func DeleteFromCart(userID int, productID int) bool {
+	prod, _ := GetProduct(productID)
+	if UserExists(userID) {
+		for k, _ := range Cart[userID] {
+			if productID == prod.ID {
+				fmt.Printf("%q удален из корзины.\n", prod.Name)
+				Cart[userID] = slices.Delete(Cart[userID], k, k+1)
+				return true
+			}
 		}
 	}
 
-	fmt.Printf("Не удалось найти %q в корзине.\n", product)
+	fmt.Printf("Не удалось найти %q в корзине.\n", prod.Name)
 	return false
 }
 
 func AddAmount(userID int, productID int) bool {
-	if product == "" {
-		fmt.Println(errors.New("Название товара не может быть пустым."))
-	}
+	prod, _ := GetProduct(productID)
+	if UserExists(userID) {
+		if productID == 0 {
+			fmt.Println("ID продукта не может быть равно 0")
+			return false
+		}
 
-	for _, j := range Cart[userID] {
-		if j.Name == product {
-			j.Amount++
-			for _, check := range Catalog {
-				if check.Name == product {
-					j.Price += check.Price
-				}
+		for _, v := range Cart[userID] {
+			if prod.ID == v.ProductID {
+				v.Amount++
+				fmt.Printf("%q увеличен на 1 шт.\n", prod.Name)
+				return true
 			}
-			fmt.Printf("%q увеличен на 1.\n", product)
-			return true
 		}
 	}
-
-	fmt.Printf("Не удалось найти %q в корзине.\n", product)
+	fmt.Printf("Не удалось найти %q в корзине.\n", prod.Name)
 	return false
 }
 
-func LowerAmount(userID int, product string) bool {
-	if product == "" {
-		fmt.Println(errors.New("Название товара не может быть пустым."))
-	}
+func LowerAmount(userID int, productID int) bool {
+	prod, _ := GetProduct(productID)
+	if UserExists(userID) {
+		if productID == 0 {
+			fmt.Println("ID продукта не может быть равно 0")
+			return false
+		}
 
-	for k, j := range Cart[userID] {
-		if j.Name == product {
-			if j.Amount > 1 {
-				j.Amount--
-				for _, check := range Catalog {
-					if check.Name == product {
-						j.Price -= check.Price
-					}
+		for k, v := range Cart[userID] {
+			if prod.ID == v.ProductID {
+				if v.Amount > 1 {
+					v.Amount--
+					fmt.Printf("%Q увеличен на 1 шт.")
+					return true
+				} else {
+					Cart[userID] = slices.Delete(Cart[userID], k, k+1)
+					fmt.Printf("%q удален из корзины.\n", prod.Name)
+					return true
 				}
-				fmt.Printf("%q уменьшен на 1.\n", product)
-				return true
-			} else {
-				Cart[userID] = slices.Delete(Cart[userID], k, k+1)
-				fmt.Printf("%q удален из корзины.\n", product)
-				return true
 			}
 		}
 	}
 
-	fmt.Printf("Не удалось найти %q в корзине.\n", product)
+	fmt.Printf("Не удалось найти %q в корзине.\n", prod.Name)
 	return false
 }
