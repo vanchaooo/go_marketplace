@@ -6,21 +6,13 @@ import (
 	"github.com/vanchaooo/go-marketplace/repository"
 )
 
-func Order(userID int, position string) bool {
+func Order(userID int, productID int) bool {
 	if repository.UserExists(userID) {
 		for _, v := range repository.Cart[userID] {
-			if v.Name == position {
-				sum := v.Price
+			if v.ProductID == productID {
+				sum := repository.ProductCost(userID, productID)
 				balance, _ := repository.GetBalance(userID)
-				if balance >= sum {
-					tovar := &repository.Position{
-						Name: v.Name,
-						Price: v.Price,
-						Amount: v.Amount,
-					}
-					fmt.Println("Заказ успешно офрмлен!")
-					repository.AddToOrders(userID, tovar)
-					repository.DeleteFromCart(userID, position)
+				if balance < sum {
 					repository.LowerBalance(userID, sum)
 					return true
 				} else {
@@ -35,11 +27,11 @@ func Order(userID int, position string) bool {
 	return false
 }
 
-func CancelOrder(userID int, position string) bool {
+func CancelOrder(userID int, productID int) bool {
 	if repository.UserExists(userID) {
-		for _, v := range repository.Orders[userID] {
-			if v.Name == position {
-				repository.DeleteOrder(userID, position)
+		for _, v := range repository.GetOrders(userID) {
+			if v.ProductID == productID {
+				repository.DeleteOrder(userID, productID)
 				repository.HigherBalance(userID, v.Price)
 			}
 		}

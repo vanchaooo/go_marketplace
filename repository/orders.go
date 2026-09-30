@@ -37,12 +37,30 @@ func AddToOrders(userID int, product *Position) bool {
 	return false
 }
 
-func GetOrders(userID int) {
+func GetOrders(userID int) []*Position {
 	if UserExists(userID) {
+		result := []*Position{}
 		for _, v := range orders[userID] {
-		fmt.Printf("ID товара: %d, Цена: %d, Кол-во: %d.", v.ProductID, v.Price, v.Amount)
+			result = append(result, v)
+			fmt.Printf("ID товара: %d, Цена: %d, Кол-во: %d.", v.ProductID, v.Price, v.Amount)
 		}
+		return result
 	}
+	return nil
+}
+
+func GetPrice(userID int, productID int) (int, bool) {
+	if UserExists(userID) {
+		if productID == 0 {
+			fmt.Println(errors.New("ID продукта не может быть равно 0"))
+			return 0, false
+		}
+		result := ProductCost(userID, productID)
+		return result, true
+	}
+
+	fmt.Println(errors.New("Не удалось рассчитать сумму товаров."))
+	return 0, false
 }
 
 func DeleteOrder(userID int, productID int) bool {
@@ -61,12 +79,18 @@ func DeleteOrder(userID int, productID int) bool {
 	return false
 }
 
-func OrdersHistory(userID int) {
-	fmt.Println("Список всех ваших заказов: ")
-	for _, v := range history {
-		for _, j := range v {
-			formatedTime := j.Time.Format("02.01.2006 в 15:04:05")
-			fmt.Printf("ID товара: %d, Дата заказа: %s.\n", j.ProductID, formatedTime)
-		}
+func OrdersHistory(userID int) bool {
+	if UserExists(userID) {
+		fmt.Println("Список всех ваших заказов: ")
+		for _, v := range history {
+			for _, j := range v {
+				formatedTime := j.Time.Format("02.01.2006 в 15:04:05")
+				fmt.Printf("ID товара: %d, Дата заказа: %s.\n", j.ProductID, formatedTime)
+				return true
+			}
+		}	
 	}
+
+	fmt.Println(errors.New("Не удалось загрузить историю заказов."))
+	return false
 }

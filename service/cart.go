@@ -10,26 +10,26 @@ func CheckCart(userID int) {
 	}
 }
 
-func AddToCart(userID int, product string) {
+func AddToCart(userID int, productID int) {
 	if repository.UserExists(userID) {
-		repository.AddToCart(userID, product)
+		repository.AddToCart(userID, productID)
 	}
 }
 
-func DeleteFromCart(userID int, product string) {
+func DeleteFromCart(userID int, productID int) {
 	if repository.UserExists(userID) {
-		repository.DeleteFromCart(userID, product)
+		repository.DeleteFromCart(userID, productID)
 	}
 }
 
-func AddAmount(userID int, product string) {
+func AddAmount(userID int, productID int) {
 	if repository.UserExists(userID) {
-		repository.AddAmount(userID, product)
+		repository.AddAmount(userID, productID)
 	}
 }
 
-func LowAmount(userID int, product string) {
+func LowAmount(userID int, productID int) {
 	if repository.UserExists(userID) {
-		repository.LowerAmount(userID, product)
+		repository.LowerAmount(userID, productID)
 	}
 }

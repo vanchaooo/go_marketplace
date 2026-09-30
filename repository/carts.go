@@ -1,7 +1,7 @@
 package repository
 
 import (
-	// "errors"
+	"errors"
 	"fmt"
 	"slices"
 	// "string"
@@ -15,7 +15,7 @@ type Item struct {
 
 var Cart = map[int][]*Item {}
 
-func TotalSum(userID int) int {
+func TotalCartCost(userID int) int {
 	if UserExists(userID) {
 		sum := 0
 		for _, v := range Cart[userID] {
@@ -25,6 +25,25 @@ func TotalSum(userID int) int {
 		}
 	}
 
+	return 0
+}
+
+func ProductCost(userID int, productID int) int {
+	prod, _ := GetProduct(productID)
+	if UserExists(userID) {
+		if productID == 0 {
+			fmt.Println(errors.New("ID продукта не может быть равно 0."))
+			return 0
+		}
+		for _, v := range Cart[userID] {
+			if v.ProductID == prod.ID {
+				result := prod.Price * v.Amount
+				return result
+			}
+		}
+	}
+
+	fmt.Println(errors.New("Не удалось простичать сумму товара."))
 	return 0
 }
 
@@ -64,7 +83,7 @@ func GetCart(userID int) bool {
 }
 
 func AddToCart(userID int, productID int) bool {
-	product, ok := GetProduct(productID)
+	prod, ok := GetProduct(productID)
 	if UserExists(userID) {
 		if productID == 0 {
 			fmt.Println("ID товара не может быть равно 0.")
@@ -82,13 +101,13 @@ func AddToCart(userID int, productID int) bool {
 				ProductID: productID,
 				Amount: 1,
 			}
-			fmt.Printf("%q добавлен в корзину.\n", product)
+			fmt.Printf("%q добавлен в корзину.\n", prod.Name)
 			Cart[userID] = append(Cart[userID], addprod)
 			return true
 		}
 	}
 
-	fmt.Printf("Не удалось найти %q в каталоге товаров.")
+	fmt.Printf("Не удалось найти %q в каталоге товаров.\n", prod.Name)
 	return false
 }
 
@@ -140,7 +159,7 @@ func LowerAmount(userID int, productID int) bool {
 			if prod.ID == v.ProductID {
 				if v.Amount > 1 {
 					v.Amount--
-					fmt.Printf("%Q увеличен на 1 шт.")
+					fmt.Printf("%q увеличен на 1 шт.\n", prod.Name)
 					return true
 				} else {
 					Cart[userID] = slices.Delete(Cart[userID], k, k+1)
