@@ -12,7 +12,7 @@ func main() {
 	service.AddToCart(9, 20)
 	service.AddToCart(9, 9)
 
-	fmt.Println()
+	fmt.Println()	
 
 	service.AddAmount(9, 9)
 
