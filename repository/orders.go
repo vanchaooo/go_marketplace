@@ -9,7 +9,6 @@ import (
 
 type Position struct {
 	ProductID int
-	Price int
 	Amount int
 }
 
@@ -40,9 +39,16 @@ func AddToOrders(userID int, product *Position) bool {
 func GetOrders(userID int) []*Position {
 	if UserExists(userID) {
 		result := []*Position{}
+
+		if len(orders) == 0 {
+			fmt.Println("Вы еще ничего не заказали")
+			return nil
+		}
+
 		for _, v := range orders[userID] {
+			prod, _ := GetProduct(v.ProductID)
 			result = append(result, v)
-			fmt.Printf("ID товара: %d, Цена: %d, Кол-во: %d.", v.ProductID, v.Price, v.Amount)
+			fmt.Printf("ID товара: %d, Товар: %s, Цена: %d, Кол-во: %d.\n", v.ProductID, prod.Name, prod.Price * v.Amount, v.Amount)
 		}
 		return result
 	}

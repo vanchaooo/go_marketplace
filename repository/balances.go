@@ -35,7 +35,7 @@ func GetEveryoneBalance() {
 
 func GetBalance(userID int) (int, bool) {
 	if UserExists(userID) {
-		fmt.Printf("ID пользователя: %d. Баланс: %d", userID, balances[userID])
+		fmt.Printf("ID пользователя: %d. Баланс: %d\n", userID, balances[userID])
 		return balances[userID], true
 	}
 

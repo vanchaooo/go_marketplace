@@ -100,15 +100,17 @@ func AddProduct(product *Product) bool {
 	return true
 }
 
-func GetCatalog() {
+func GetCatalog() int {
+	count := 0
 	for _, v := range catalog {
 		fmt.Printf("ID: %d, Товар: %s, Цена: %d, В наличии: %d шт.\n", v.ID, v.Name, v.Price, v.Stock)
+		count++
 	}
+	return count
 }
 
 func GetProduct(id int) (*Product, bool) {
 	if product, ok := catalog[id]; ok {
-		fmt.Printf("ID: %d || Товар: %s, Цена: %d, Кол-во на складе: %d шт.\n", product.ID, product.Name, product.Price, product.Stock)
 		return product, true
 	} else {
 		fmt.Println(errors.New("С таким ID, товара не найдено."))

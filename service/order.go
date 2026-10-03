@@ -12,7 +12,12 @@ func Order(userID int, productID int) bool {
 			if v.ProductID == productID {
 				sum := repository.ProductCost(userID, productID)
 				balance, _ := repository.GetBalance(userID)
-				if balance < sum {
+				if balance > sum {
+					item := &repository.Position{
+						ProductID: productID,
+						Amount: v.Amount,
+					}
+					repository.AddToOrders(userID, item)
 					repository.LowerBalance(userID, sum)
 					return true
 				} else {
@@ -30,9 +35,10 @@ func Order(userID int, productID int) bool {
 func CancelOrder(userID int, productID int) bool {
 	if repository.UserExists(userID) {
 		for _, v := range repository.GetOrders(userID) {
+			prod, _ := repository.GetProduct(productID)
 			if v.ProductID == productID {
 				repository.DeleteOrder(userID, productID)
-				repository.HigherBalance(userID, v.Price)
+				repository.HigherBalance(userID, prod.Price * v.Amount)
 			}
 		}
 	}

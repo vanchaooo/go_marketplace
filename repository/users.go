@@ -46,10 +46,13 @@ func AddUser(user *User) {
 	users[user.ID] = user
 }
 
-func GetAllUsers() {
+func GetAllUsers() int {
+	count := 0
 	for _, v := range users {
 		fmt.Printf("ID: %d, Имя: %s.\n", v.ID, v.Name)
+		count++
 	}
+	return count
 }
 
 func GetUser(id int) (*User, bool) {
