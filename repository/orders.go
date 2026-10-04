@@ -1,26 +1,26 @@
 package repository
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 	"slices"
 	"time"
 )
 
 type Position struct {
-	ProductID int
-	Amount int
+	ProductID int64
+	Amount int64
 }
 
 type Data struct {
-	ProductID int
+	ProductID int64
 	Time time.Time
 }
 
-var orders = map[int][]*Position {}
-var history = map[int][]*Data {}
+var orders = map[int64][]*Position {}
+var history = map[int64][]*Data {}
 
-func AddToOrders(userID int, product *Position) bool {
+func AddToOrders(userID int64, product *Position) bool {
 	if UserExists(userID) {
 		data := &Data {
 			ProductID: product.ProductID,
@@ -36,7 +36,7 @@ func AddToOrders(userID int, product *Position) bool {
 	return false
 }
 
-func GetOrders(userID int) []*Position {
+func GetOrders(userID int64) []*Position {
 	if UserExists(userID) {
 		result := []*Position{}
 
@@ -55,7 +55,7 @@ func GetOrders(userID int) []*Position {
 	return nil
 }
 
-func GetPrice(userID int, productID int) (int, bool) {
+func GetPrice(userID int64, productID int64) (int64, bool) {
 	if UserExists(userID) {
 		if productID == 0 {
 			fmt.Println(errors.New("ID продукта не может быть равно 0"))
@@ -69,7 +69,7 @@ func GetPrice(userID int, productID int) (int, bool) {
 	return 0, false
 }
 
-func DeleteOrder(userID int, productID int) bool {
+func DeleteOrder(userID int64, productID int64) bool {
 	prod, _ := GetProduct(productID)
 	if UserExists(userID) {
 		for k, v := range orders[productID] {
@@ -85,7 +85,7 @@ func DeleteOrder(userID int, productID int) bool {
 	return false
 }
 
-func OrdersHistory(userID int) bool {
+func OrdersHistory(userID int64) bool {
 	if UserExists(userID) {
 		fmt.Println("Список всех ваших заказов: ")
 		for _, v := range history {

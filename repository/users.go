@@ -6,11 +6,11 @@ import (
 )
 
 type User struct {
-	ID   int
+	ID   int64
 	Name string
 }
 
-var users = map[int]*User{
+var users = map[int64]*User{
 	1:  {ID: 1, Name: "Иван"},
 	2:  {ID: 2, Name: "Мария"},
 	3:  {ID: 3, Name: "Алексей"},
@@ -28,7 +28,7 @@ var users = map[int]*User{
 	15: {ID: 15, Name: "Николай"},
 }
 
-func UserExists(userID int) bool {
+func UserExists(userID int64) bool {
 	if _, ok := users[userID]; !ok {
 		fmt.Println(errors.New("Не удалось найти пользователя с таким ID."))
 		return false
@@ -42,20 +42,20 @@ func AddUser(user *User) {
 		fmt.Println(errors.New("Имя пользователя не может быть пустым."))
 	}
 
-	user.ID = len(users)+1
+	user.ID = int64(len(users)+1)
 	users[user.ID] = user
 }
 
-func GetAllUsers() int {
+func GetAllUsers() int64 {
 	count := 0
 	for _, v := range users {
 		fmt.Printf("ID: %d, Имя: %s.\n", v.ID, v.Name)
 		count++
 	}
-	return count
+	return int64(count)
 }
 
-func GetUser(id int) (*User, bool) {
+func GetUser(id int64) (*User, bool) {
 	if id <= 0 {
 		fmt.Println(errors.New("ID Пользователя должно быть больше 0."))
 		return nil, false
@@ -70,7 +70,7 @@ func GetUser(id int) (*User, bool) {
 	return nil, false
 }
 
-func DeleteUser(id int) bool {
+func DeleteUser(id int64) bool {
 	if id <= 0 {
 		fmt.Println(errors.New("ID Пользователя должно быть больше 0."))
 		return false

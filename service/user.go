@@ -14,19 +14,19 @@ func RegisterUser(name string) {
 	SetZeroBalance(strct.ID)
 }
 
-func SetZeroBalance(userID int) {
+func SetZeroBalance(userID int64) {
 	if repository.UserExists(userID) {
 		repository.CreateBalance(userID)
 	}
 }
 
-func UpdateBalance(userID int, number int) {
+func UpdateBalance(userID int64, number int64) {
 	if repository.UserExists(userID) {
 		repository.HigherBalance(userID, number)
 	}
 }
 
-func LowerBalance(userID int, number int) {
+func LowerBalance(userID int64, number int64) {
 	if repository.UserExists(userID) {
 		repository.LowerBalance(userID, number)
 	}

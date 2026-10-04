@@ -6,7 +6,7 @@ import (
 	"github.com/vanchaooo/go-marketplace/repository"
 )
 
-func Order(userID int, productID int) bool {
+func Order(userID int64, productID int64) bool {
 	if repository.UserExists(userID) {
 		for _, v := range repository.Cart[userID] {
 			if v.ProductID == productID {
@@ -32,7 +32,7 @@ func Order(userID int, productID int) bool {
 	return false
 }
 
-func CancelOrder(userID int, productID int) bool {
+func CancelOrder(userID int64, productID int64) bool {
 	if repository.UserExists(userID) {
 		for _, v := range repository.GetOrders(userID) {
 			prod, _ := repository.GetProduct(productID)
@@ -47,13 +47,13 @@ func CancelOrder(userID int, productID int) bool {
 	return false
 }
 
-func GetMyOrders(userID int) {
+func GetMyOrders(userID int64) {
 	if repository.UserExists(userID) {
 		repository.GetOrders(userID)
 	}
 }
 
-func CheckOrdersHistory(userID int) bool {
+func CheckOrdersHistory(userID int64) bool {
 	if repository.UserExists(userID) {
 		repository.OrdersHistory(userID)
 		return true

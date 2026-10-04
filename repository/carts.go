@@ -7,26 +7,26 @@ import (
 )
 
 type Item struct {
-	ProductID int
-	Amount int
+	ProductID int64
+	Amount int64
 }
 
-var Cart = map[int][]*Item {}
+var Cart = map[int64][]*Item {}
 
-func TotalCartCost(userID int) int {
+func TotalCartCost(userID int64) int64 {
 	if UserExists(userID) {
-		sum := 0
+		var sum int64 = 0
 		for _, v := range Cart[userID] {
 			prod, _ := GetProduct(v.ProductID)
 			sum += prod.Price * v.Amount
-			return sum
+			return int64(sum)
 		}
 	}
 
 	return 0
 }
 
-func ProductCost(userID int, productID int) int {
+func ProductCost(userID int64, productID int64) int64 {
 	prod, _ := GetProduct(productID)
 	if UserExists(userID) {
 		if productID == 0 {
@@ -45,8 +45,8 @@ func ProductCost(userID int, productID int) int {
 	return 0
 }
 
-func GetQuantity() int {
-	count := 0
+func GetQuantity() int64 {
+	var count int64 = 0
 	for _, v := range Cart {
 		for _, j := range v {
 			count += j.Amount
@@ -55,10 +55,10 @@ func GetQuantity() int {
 	return count
 }
 
-func GetCart(userID int) bool {
+func GetCart(userID int64) bool {
 	if UserExists(userID) {
-		total := 0
-		summ := 0
+		var total int64 = 0
+		var summ int64 = 0
 
 		fmt.Printf("Корзина пользователя %d:\n", userID)
 		for _, v := range Cart[userID] {
@@ -80,7 +80,7 @@ func GetCart(userID int) bool {
 	return false
 }
 
-func AddToCart(userID int, productID int) bool {
+func AddToCart(userID int64, productID int64) bool {
 	prod, ok := GetProduct(productID)
 	if UserExists(userID) {
 		if productID == 0 {
@@ -109,7 +109,7 @@ func AddToCart(userID int, productID int) bool {
 	return false
 }
 
-func DeleteFromCart(userID int, productID int) bool {
+func DeleteFromCart(userID int64, productID int64) bool {
 	prod, _ := GetProduct(productID)
 	if UserExists(userID) {
 		for k, _ := range Cart[userID] {
@@ -125,7 +125,7 @@ func DeleteFromCart(userID int, productID int) bool {
 	return false
 }
 
-func AddAmount(userID int, productID int) bool {
+func AddAmount(userID int64, productID int64) bool {
 	prod, _ := GetProduct(productID)
 	if UserExists(userID) {
 		if productID == 0 {
@@ -145,7 +145,7 @@ func AddAmount(userID int, productID int) bool {
 	return false
 }
 
-func LowerAmount(userID int, productID int) bool {
+func LowerAmount(userID int64, productID int64) bool {
 	prod, _ := GetProduct(productID)
 	if UserExists(userID) {
 		if productID == 0 {

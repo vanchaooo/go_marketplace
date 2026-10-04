@@ -5,7 +5,7 @@ import (
 	"errors"
 )
 
-var balances = map[int]int{
+var balances = map[int64]int64{
 	1: 0,
 	2: 0,
 	3: 0,
@@ -23,7 +23,7 @@ var balances = map[int]int{
 	15: 0,
 }
 
-func CreateBalance(userID int) {
+func CreateBalance(userID int64) {
 	balances[userID] = 0
 }
 
@@ -33,7 +33,7 @@ func GetEveryoneBalance() {
 	}
 }
 
-func GetBalance(userID int) (int, bool) {
+func GetBalance(userID int64) (int64, bool) {
 	if UserExists(userID) {
 		fmt.Printf("ID пользователя: %d. Баланс: %d\n", userID, balances[userID])
 		return balances[userID], true
@@ -43,7 +43,7 @@ func GetBalance(userID int) (int, bool) {
 	return 0, false
 }
 
-func DeleteBalance(userID int) bool {
+func DeleteBalance(userID int64) bool {
 	if UserExists(userID) {
 		delete(balances, userID)
 		fmt.Println("Баланс удален.")
@@ -54,7 +54,7 @@ func DeleteBalance(userID int) bool {
 	return false
 }
 
-func LowerBalance(userID int, balance int) bool {
+func LowerBalance(userID int64, balance int64) bool {
 	if UserExists(userID) {
 		if balance == 0 {
 			fmt.Println(errors.New("Сумма не может быть равна 0"))
@@ -74,7 +74,7 @@ func LowerBalance(userID int, balance int) bool {
 	return false
 }
 
-func HigherBalance(userID int, balance int) bool {
+func HigherBalance(userID int64, balance int64) bool {
 	if UserExists(userID) {
 		if balance == 0 {
 			fmt.Println(errors.New("Сумма не может быть равна 0."))

@@ -1,34 +1,38 @@
 package main
 
 type User struct {
-	ID int
+	ID int64
 	Name string
-	Balance int
+}
+
+type Wallet struct {
+	UserID int64
+	Balance int64
 }
 
 type Product struct {
-	ID int
+	ID int64
 	Name string
-	Price int
-	Stock int
+	Price int64
+	Stock int64
 }
 
 type Cart struct {
-	UserID int
-	Items map[int]int
+	UserID int64
+	Items map[int64]int64
 }
 
 type OrderItem struct {
-	ProductID int
+	ProductID int64
 	ProductName string
-	Price int
-	Quantity int
+	Price int64
+	Quantity int64
 }
 
 type Order struct {
-	OrderID int
-	UserID int
-	ProductID int
-	Total int
+	OrderID int64
+	UserID int64
+	Product []OrderItem
+	Total int64
 	Status string
 }
