@@ -1,28 +1,32 @@
 package main
 
-func (m *Marketplace) AddUser(id int64, name string) bool {
-	user, ok := NewUser(name)
+func (m *Marketplace) AddUser(userID int64, name string) bool {
+	if m.usedUserIDs[userID] {
+		return false
+	}
+
+	user, ok := NewUser(userID, name)
 	if !ok {
 		return false
 	}
-	wallet, ok := NewWallet(id)
+	wallet, ok := NewWallet(userID)
 	if !ok {
 		return false
 	}
-	cart, ok := NewCart(id)
+	cart, ok := NewCart(userID)
 	if !ok {
 		return false
 	}
  
-	m.users[id] = &user
-	m.wallets[id] = &wallet
-	m.carts[id] = &cart
-	m.usedUserIDs[id] = true
+	m.users[userID] = &user
+	m.wallets[userID] = &wallet
+	m.carts[userID] = &cart
+	m.usedUserIDs[userID] = true
 	return true
 }
  
-func (m *Marketplace) RenameUser(id int64, name string) bool {
-	user, exists := m.users[id]
+func (m *Marketplace) RenameUser(userID int64, name string) bool {
+	user, exists := m.users[userID]
 	if !exists {
 		return false
 	}
@@ -36,26 +40,26 @@ func (m *Marketplace) RenameUser(id int64, name string) bool {
 	return true
 }
  
-func (m *Marketplace) DeleteUser(id int64) bool {
-	_, exists := m.users[id]
+func (m *Marketplace) DeleteUser(userID int64) bool {
+	_, exists := m.users[userID]
 	if !exists {
 		return false
 	}
  
-	wallet, exists := m.wallets[id]
+	wallet, exists := m.wallets[userID]
 	if !exists || wallet.Balance != 0 {
 		return false
 	}
  
 	for _, order := range m.orders {
-		if order.UserID == id && order.IsPaid() {
+		if order.UserID == userID && order.IsPaid() {
 			return false
 		}
 	}
  
-	delete(m.users, id)
-	delete(m.wallets, id)
-	delete(m.carts, id)
+	delete(m.users, userID)
+	delete(m.wallets, userID)
+	delete(m.carts, userID)
 	return true
 }
  
@@ -87,7 +91,7 @@ func (m *Marketplace) AddProduct(id int64, name string, price, stock int64) bool
 	m.products[id] = &product
 	return true
 }
- 
+
 func (m *Marketplace) UpdateProductStock(id, stock int64) bool {
 	product, exists := m.products[id]
 	if !exists {

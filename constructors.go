@@ -4,7 +4,6 @@ import (
 	"unicode/utf8"
 	"strings"
 	"math"
-	"github.com/vanchaooo/go-marketplace/repository"
 )
 
 func normalizeName(name string) (string, bool) {
@@ -17,28 +16,28 @@ func normalizeName(name string) (string, bool) {
 	return name, true
 }
 
-func NewUser(name string) (User, bool) {
+func NewUser(userID int64, name string) (User, bool) {
 	name, ok := normalizeName(name)
 	if ok {
-		return User{ID: repository.GetAllUsers()+1, Name: name}, true
+		return User{ID: userID, Name: name}, true
 	}
 
 	return User{}, false
 }
 
 func NewWallet(userID int64) (Wallet, bool) {
-	if repository.UserExists(userID) {
-		return Wallet{UserID: userID, Balance: 0}, true
+	if userID <= 0 {
+		return Wallet{}, false
 	}
 	
-	return Wallet{}, false
+	return Wallet{UserID: userID, Balance: 0}, true
 }
 
 func NewProduct(productID int64, name string, price int64, stock int64) (Product, bool) {
 	if productID <= 0 {
 		return Product{}, false
 	}
- 
+
 	name, ok := normalizeName(name)
 	if !ok {
 		return Product{}, false
@@ -49,20 +48,20 @@ func NewProduct(productID int64, name string, price int64, stock int64) (Product
 	if stock < 0 {
 		return Product{}, false
 	}
- 
+
 	return Product{ID: productID, Name: name, Price: price, Stock: stock}, true
 }
- 
+
 func NewCart(userID int64) (Cart, bool) {
-	if repository.UserExists(userID) {
-		return Cart{UserID: userID, Items: make(map[int64]int64)}, true
+	if userID <= 0 {
+		return Cart{}, false
 	}
 	
-	return Cart{}, false
+	return Cart{UserID: userID, Items: make(map[int64]int64)}, true
 }
  
-func isValidOrderItem(item OrderItem) bool {
-	return item.ProductID > 0 && item.Price > 0 && item.Quantity > 0 && item.ProductName != ""
+func isValidOrderItem(product OrderItem) bool {
+	return product.ProductID > 0 && product.Price > 0 && product.Quantity > 0 && product.ProductName != ""
 }
  
 func NewOrderItem(product Product, quantity int64) (OrderItem, bool) {
@@ -80,10 +79,10 @@ func NewOrderItem(product Product, quantity int64) (OrderItem, bool) {
 	return OrderItem{}, false
 }
 
-func CalculateOrderTotal(items []OrderItem) (int64, bool) {
+func CalculateOrderTotal(products []OrderItem) (int64, bool) {
 	var total int64 = 0
  
-	for _, item := range items {
+	for _, item := range products {
 		if !isValidOrderItem(item) {
 			return 0, false
 		}
@@ -101,14 +100,14 @@ func CalculateOrderTotal(items []OrderItem) (int64, bool) {
 	return total, true
 }
 
-func CopyOrderItems(items []OrderItem) []OrderItem {
-	itemsCopy := make([]OrderItem, len(items))
-	copy(itemsCopy, items)
+func CopyOrderItems(products []OrderItem) []OrderItem {
+	itemsCopy := make([]OrderItem, len(products))
+	copy(itemsCopy, products)
 	return itemsCopy
 }
 
-func NewOrder(id int64, userID int64, items []OrderItem) (Order, bool) {
-	if id <= 0 || userID <= 0 {
+func NewOrder(orderID int64, userID int64, items []OrderItem) (Order, bool) {
+	if orderID <= 0 || userID <= 0 {
 		return Order{}, false
 	}
 	if len(items) == 0 {
@@ -123,10 +122,10 @@ func NewOrder(id int64, userID int64, items []OrderItem) (Order, bool) {
 	}
  
 	order := Order{
-		OrderID:     id,
+		OrderID: orderID,
 		UserID: userID,
-		Product:  itemsCopy,
-		Total:  total,
+		Product: itemsCopy,
+		Total: total,
 		Status: "paid",
 	}
 	return order, true
