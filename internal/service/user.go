@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	"github.com/vanchaooo/go-marketplace/repository"
+	"github.com/vanchaooo/go-marketplace/internal/repository"
 )
 
 func RegisterUser(name string) {

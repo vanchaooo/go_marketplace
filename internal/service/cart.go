@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/vanchaooo/go-marketplace/repository"
+	"github.com/vanchaooo/go-marketplace/internal/repository"
 )
 
 func CheckCart(userID int64) {

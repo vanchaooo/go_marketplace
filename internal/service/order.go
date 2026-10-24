@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 	"errors"
-	"github.com/vanchaooo/go-marketplace/repository"
+	"github.com/vanchaooo/go-marketplace/internal/repository"
 )
 
 func Order(userID int64, productID int64) bool {

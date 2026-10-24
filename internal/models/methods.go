@@ -1,6 +1,6 @@
-package main
+package models
 
-func (w Wallet) HasEnoughMoney(amount int64) bool {
+func (w *Wallet) HasEnoughMoney(amount int64) bool {
 	if amount <= 0 {
 		return false
 	}
@@ -98,11 +98,11 @@ func (c *Cart) Clear() {
 }
 
 func (o Order) IsPaid() bool {
-	return o.Status == "paid"
+	return o.Status == "Paid"
 }
  
 func (o Order) IsCancelled() bool {
-	return o.Status == "cancelled"
+	return o.Status == "Cancelled"
 }
 
 func (o *Order) MarkCancelled() bool {
@@ -110,6 +110,6 @@ func (o *Order) MarkCancelled() bool {
 		return false
 	}
  
-	o.Status = "cancelled"
+	o.Status = "Cancelled"
 	return true
 }

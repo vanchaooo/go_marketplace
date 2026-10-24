@@ -1,4 +1,4 @@
-package main
+package models
 
 type User struct {
 	ID int64
@@ -10,16 +10,16 @@ type Wallet struct {
 	Balance int64
 }
 
+type Cart struct {
+	UserID int64
+	Items map[int64]int64
+}
+
 type Product struct {
 	ID int64
 	Name string
 	Price int64
 	Stock int64
-}
-
-type Cart struct {
-	UserID int64
-	Items map[int64]int64
 }
 
 type OrderItem struct {

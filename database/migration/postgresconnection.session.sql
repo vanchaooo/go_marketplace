@@ -1,0 +1,6 @@
+CREATE TABLE users 
+(
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(200) NOT NULL CHECK (char_length(name) > 0),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
