@@ -1,87 +1,56 @@
 package repository
 
 import (
-	"fmt"
-	"errors"
+	// "errors"
+	"strings"
+	"slices"
+	"github.com/vanchaooo/go-marketplace/internal/model"
 )
 
-type User struct {
-	ID   int64
-	Name string
+type UserRepository struct {
+	users map[int64]*model.User
+	usedIDs map[int64]bool
 }
 
-var users = map[int64]*User{
-	1:  {ID: 1, Name: "Иван"},
-	2:  {ID: 2, Name: "Мария"},
-	3:  {ID: 3, Name: "Алексей"},
-	4:  {ID: 4, Name: "Ольга"},
-	5:  {ID: 5, Name: "Дмитрий"},
-	6:  {ID: 6, Name: "Елена"},
-	7:  {ID: 7, Name: "Александр"},
-	8:  {ID: 8, Name: "Анна"},
-	9:  {ID: 9, Name: "Михаил"},
-	10: {ID: 10, Name: "Татьяна"},
-	11: {ID: 11, Name: "Сергей"},
-	12: {ID: 12, Name: "Наталья"},
-	13: {ID: 13, Name: "Артем"},
-	14: {ID: 14, Name: "Ирина"},
-	15: {ID: 15, Name: "Николай"},
-}
-
-func UserExists(userID int64) bool {
-	if _, ok := users[userID]; !ok {
-		fmt.Println(errors.New("Не удалось найти пользователя с таким ID."))
-		return false
-	} else {
-		return true
+func NewUserRepository() *UserRepository {
+	return &UserRepository {
+		users: make(map[int64]*model.User),
+		usedIDs: make(map[int64]bool),
 	}
 }
 
-func AddUser(user *User) {
-	if user.Name == "" {
-		fmt.Println(errors.New("Имя пользователя не может быть пустым."))
-	}
-
-	user.ID = int64(len(users)+1)
-	users[user.ID] = user
+func (u *UserRepository) Add(user *model.User) {
+	u.users[user.ID] = user
+	u.usedIDs[user.ID] = true
 }
 
-func GetAllUsers() int64 {
-	count := 0
-	for _, v := range users {
-		fmt.Printf("ID: %d, Имя: %s.\n", v.ID, v.Name)
-		count++
-	}
-	return int64(count)
+func (u *UserRepository) Get(userID int64) (*model.User, bool) {
+	user, ok := u.users[userID]
+	return user, ok
 }
 
-func GetUser(id int64) (*User, bool) {
-	if id <= 0 {
-		fmt.Println(errors.New("ID Пользователя должно быть больше 0."))
-		return nil, false
-	}
-	
-	if user, ok := users[id]; ok {
-		fmt.Printf("По такому ID был найден: %q.\n", user.Name)
-		return user, ok
-	}
+func (u *UserRepository) GetEveryoneByName(name string) []int64 {
+	name = strings.ToLower(name)
+	result := []int64{}
 
-	fmt.Println(errors.New("Пользователь с таким ID не был найден."))
-	return nil, false
+	for id, user := range u.users {
+		if strings.Contains(strings.ToLower(user.Name), name) {
+			result = append(result, id)
+		}
+	}
+	slices.Sort(result)
+	return result
 }
 
-func DeleteUser(id int64) bool {
-	if id <= 0 {
-		fmt.Println(errors.New("ID Пользователя должно быть больше 0."))
-		return false
-	}
+func (u *UserRepository) Delete(userID int64) {
+	delete(u.users, userID)
+}
 
-	if _, ok := users[id]; ok {
-		fmt.Println("Пользователь успешно удален.")
-		delete(users, id)
-		return true
-	}
-	
-	fmt.Println(errors.New("Пользователя с таким ID не найдено."))
-	return false
+func (u *UserRepository) Exists(userID int64) bool {
+	_, ok := u.users[userID]
+	return ok
+}
+
+func (u *UserRepository) UsedID(userID int64) bool {
+	return u.usedIDs[userID]
 }

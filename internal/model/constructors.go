@@ -110,8 +110,8 @@ func CopyOrderItems(products []OrderItem) []OrderItem {
 	return itemsCopy
 }
  
-func NewOrder(orderID int64, userID int64, items []OrderItem) (Order, bool) {
-	if orderID <= 0 || userID <= 0 {
+func NewOrder(userID int64, items []OrderItem) (Order, bool) {
+	if userID <= 0 {
 		return Order{}, false
 	}
 	if len(items) == 0 {
@@ -126,7 +126,6 @@ func NewOrder(orderID int64, userID int64, items []OrderItem) (Order, bool) {
 	}
  
 	order := Order{
-		OrderID: orderID,
 		UserID:  userID,
 		Product: itemsCopy,
 		Total:   total,
