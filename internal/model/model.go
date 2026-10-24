@@ -1,4 +1,9 @@
-package models
+package model
+
+const (
+	StatusPaid      = "Paid"
+	StatusCancelled = "Cancelled"
+)
 
 type User struct {
 	ID int64
@@ -12,7 +17,7 @@ type Wallet struct {
 
 type Cart struct {
 	UserID int64
-	Items map[int64]int64
+	Items map[int64]int64 // ID товара - Кол-во
 }
 
 type Product struct {

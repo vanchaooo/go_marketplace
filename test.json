@@ -1,0 +1,10 @@
+{
+    "name": "Ivan",
+    "age": 19,
+    "married": false,
+    "hobbies": ["programming", "sport"],
+    "address": {
+        "country": "Russia",
+        "city": "Obninsk"
+    }
+}
