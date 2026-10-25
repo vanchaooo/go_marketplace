@@ -1,9 +1,9 @@
 package model
-
+ 
 import (
-	"unicode/utf8"
-	"strings"
 	"math"
+	"strings"
+	"unicode/utf8"
 )
 
 func normalizeName(name string) (string, bool) {
@@ -16,17 +16,13 @@ func normalizeName(name string) (string, bool) {
 	return name, true
 }
  
-func NewUser(userID int64, name string) (User, bool) {
-	if userID <= 0 {
-		return User{}, false
-	}
- 
+func NewUser(name string) (User, bool) {
 	name, ok := normalizeName(name)
 	if !ok {
 		return User{}, false
 	}
  
-	return User{ID: userID, Name: name}, true
+	return User{Name: name}, true
 }
  
 func NewWallet(userID int64) (Wallet, bool) {

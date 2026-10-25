@@ -1,7 +1,7 @@
 package repository
 
 import (
-	// "errors"
+	"math"
 	"strings"
 	"slices"
 	"github.com/vanchaooo/go-marketplace/internal/model"
@@ -9,19 +9,25 @@ import (
 
 type UserRepository struct {
 	users map[int64]*model.User
-	usedIDs map[int64]bool
+	nextID int64
 }
 
 func NewUserRepository() *UserRepository {
 	return &UserRepository {
 		users: make(map[int64]*model.User),
-		usedIDs: make(map[int64]bool),
+		nextID: 1,
 	}
 }
 
-func (u *UserRepository) Add(user *model.User) {
+func (u *UserRepository) Add(user *model.User) (int64, bool) {
+	if u.nextID <= 0 || u.nextID == math.MaxInt64 {
+		return 0, false
+	}
+ 
+	user.ID = u.nextID
 	u.users[user.ID] = user
-	u.usedIDs[user.ID] = true
+	u.nextID++
+	return user.ID, true
 }
 
 func (u *UserRepository) Get(userID int64) (*model.User, bool) {
@@ -49,8 +55,4 @@ func (u *UserRepository) Delete(userID int64) {
 func (u *UserRepository) Exists(userID int64) bool {
 	_, ok := u.users[userID]
 	return ok
-}
-
-func (u *UserRepository) UsedID(userID int64) bool {
-	return u.usedIDs[userID]
 }

@@ -25,7 +25,7 @@ func (p ProductRepository) Get(productID int64) (*model.Product, bool) {
 	return product, ok
 }
 
-func (p ProductRepository) GetEveryoneByName(name string) []int64 {
+func (p ProductRepository) Search(name string) []int64 {
 	name = strings.ToLower(name)
 	result := []int64{}
 
