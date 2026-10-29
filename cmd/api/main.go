@@ -1,62 +1,60 @@
 package main
- 
+
 import (
+	// "encoding/json"
 	"fmt"
- 
-	"github.com/vanchaooo/go-marketplace/internal/repository"
-	"github.com/vanchaooo/go-marketplace/internal/service"
+	"io"
+	"log"
+	"net/http"
+	// "github.com/tidwall/gjson"
 )
- 
+
+type Todo struct {
+	UserID int `json:"userId"`
+	ID int	`json:"id"`
+	Title string `json:"title"`
+	Completed bool `json:"completed"`
+}
+
+// func main() {
+// 	url := "https://jsonplaceholder.typicode.com/todos/7"
+
+// 	response, err := http.Get(url)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer response.Body.Close()
+
+// 	if response.StatusCode == http.StatusOK {
+
+// 		data, err := io.ReadAll(response.Body)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+
+// 		todo := gjson.Parse(string(data))
+// 		fmt.Println(todo)
+// 	}
+// }
+
 func main() {
-	users := repository.NewUserRepository()
-	wallets := repository.NewWalletRepository()
-	products := repository.NewProductRepository()
-	carts := repository.NewCartRepository()
-	orders := repository.NewOrderPerository()
-	history := repository.NewHistoryRepository()
- 
-	userService := service.NewUserService(users, wallets, carts, orders)
-	walletService := service.NewWalletService(users, wallets)
-	productService := service.NewProductService(products)
-	cartService := service.NewCartService(users, carts, products)
-	orderService := service.NewOrderService(users, wallets, products, carts, orders, history)
- 
-	userID, ok := userService.AddUser("Иван")
-	fmt.Println("AddUser:", userID, ok)
-	secondID, ok := userService.AddUser("Мария")
-	fmt.Println("AddUser (второй):", secondID, ok)
-	fmt.Println("DeleteUser (второй, пустой):", userService.DeleteUser(secondID))
-	thirdID, ok := userService.AddUser("Алексей")
-	fmt.Println("AddUser (после удаления, номер не повторяется):", thirdID, ok)
-	fmt.Println("AddUser (пустое имя):")
-	_, ok = userService.AddUser("   ")
-	fmt.Println(" ", ok)
- 
-	fmt.Println("AddProduct:", productService.AddNewProduct(1, "Книга 'Изучаем Go'", 2600, 10))
-	fmt.Println("TopUp:", walletService.TopUpBalance(userID, 10000))
-	fmt.Println("AddToCart:", cartService.AddToCart(userID, 1, 2))
- 
-	total, _ := cartService.CalculateCartTotal(userID)
-	fmt.Println("Сумма корзины:", total)
- 
-	orderID, ok := orderService.MakeOrder(userID)
-	fmt.Println("Checkout:", orderID, ok)
- 
-	balance, _ := walletService.GetBalance(userID)
-	product, _ := productService.GetProduct(1)
-	fmt.Println("Баланс после покупки:", balance, "| остаток товара:", product.Stock)
- 
-	fmt.Println("DeleteUser (есть оплаченный заказ):", userService.DeleteUser(userID))
- 
-	fmt.Println("CancelOrder:", orderService.CancelOrder(userID, orderID))
-	fmt.Println("CancelOrder (повторно):", orderService.CancelOrder(userID, orderID))
- 
-	balance, _ = walletService.GetBalance(userID)
-	product, _ = productService.GetProduct(1)
-	fmt.Println("Баланс после отмены:", balance, "| остаток товара:", product.Stock)
- 
-	fmt.Println("Заказы пользователя:", orderService.GetUserOrders(userID))
-	for _, line := range orderService.GetUserHistory(userID) {
-		fmt.Println(" -", line)
+	url := "https://jsonplaceholder.typicode.com/todos/7"
+
+	response, err := http.Get(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if response.StatusCode == http.StatusOK {
+		// todo := Todo{}
+
+		data, err := io.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// json.Unmarshal([]byte(data), todo)
+		// fmt.Printf("API: %+v\n", string(data))
+		fmt.Println(string(data))
 	}
 }
