@@ -1,6 +1,11 @@
 package service
 
 import (
+	"context"
+	"math"
+	"strings"
+	"unicode/utf8"
+
 	"github.com/vanchaooo/go-marketplace/internal/model"
 	"github.com/vanchaooo/go-marketplace/internal/repository"
 )
@@ -17,18 +22,25 @@ func NewProductService(
 	}
 }
 
-func (p *ProductService) AddNewProduct(productID int64, name string, price, stock int64) bool {
-	if p.products.Exists(productID) {
-		return false
+func (p *ProductService) AddNewProduct(ctx context.Context, productID int64, name string, price, stock int64) (model.Product, error) {
+	name = strings.TrimSpace(name)
+	if length := utf8.RuneCountInString(name); length < 1 || length > 200 {
+		return model.Product{}, ErrInvalidName
 	}
-
-	product, ok := model.NewProduct(productID, name, price, stock)
-	if !ok {
-		return false
+	if price < 0 || price > math.MaxInt64 {
+		return model.Product{}, ErrInvalidPrice
 	}
-
-	p.products.Add(&product)
-	return true
+	if stock < 0 || stock > math.MaxInt64 {
+		return model.Product{}, ErrInvalidStock
+	}
+	model := &model.Product {
+		ID: productID,
+		Name: name,
+		Price: price,
+		Stock: stock,
+	}
+	p.products.Add(model)
+	return *model, nil
 }
 
 func (p *ProductService) ChangeProductPrice(productID, newPrice int64) bool {

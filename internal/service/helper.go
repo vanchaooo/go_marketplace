@@ -1,10 +1,16 @@
 package service
 
 import (
+	"errors"
 	"sort"
 	"github.com/vanchaooo/go-marketplace/internal/model"
 	"github.com/vanchaooo/go-marketplace/internal/repository"
 )
+
+var ErrInvalidName = errors.New("Имя должно содержать от 1 до 200 символов.")
+var ErrInvalidPrice = errors.New("Цена должна быть не менее 0 рублей.")
+var ErrInvalidStock = errors.New("Количество должно быть не менее 0 штук.")
+
 
 func userCart(
 	users *repository.UserRepository,
