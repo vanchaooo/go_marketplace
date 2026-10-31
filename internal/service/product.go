@@ -22,7 +22,7 @@ func NewProductService(
 	}
 }
 
-func (p *ProductService) AddNewProduct(ctx context.Context, productID int64, name string, price, stock int64) (model.Product, error) {
+func (p *ProductService) AddNewProduct(ctx context.Context, name string, price, stock int64) (model.Product, error) {
 	name = strings.TrimSpace(name)
 	if length := utf8.RuneCountInString(name); length < 1 || length > 200 {
 		return model.Product{}, ErrInvalidName
@@ -33,14 +33,16 @@ func (p *ProductService) AddNewProduct(ctx context.Context, productID int64, nam
 	if stock < 0 || stock > math.MaxInt64 {
 		return model.Product{}, ErrInvalidStock
 	}
-	model := &model.Product {
-		ID: productID,
+	product := model.Product {
 		Name: name,
 		Price: price,
 		Stock: stock,
 	}
-	p.products.Add(model)
-	return *model, nil
+	result, err := p.products.Add(ctx, &product)
+	if err != nil {
+		return model.Product{}, err
+	}
+	return result, nil
 }
 
 func (p *ProductService) ChangeProductPrice(productID, newPrice int64) bool {

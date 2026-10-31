@@ -1,23 +1,40 @@
 package repository
 
 import (
-	"strings"
+	"context"
 	"slices"
+	"strings"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/vanchaooo/go-marketplace/internal/model"
 )
 
 type ProductRepository struct {
-	products map[int64]*model.Product
+	pool *pgxpool.Pool
 }
 
-func NewProductRepository() *ProductRepository {
+func NewProductRepository(pool *pgxpool.Pool) *ProductRepository {
 	return &ProductRepository{
-		products: make(map[int64]*model.Product),
+		pool: pool,
 	}
 }
 
-func (p ProductRepository) Add(product *model.Product) {
-	p.products[product.ID] = product
+func (p ProductRepository) Add(ctx context.Context, newProduct *model.Product) (model.Product, error) {
+	const query = `
+		INSERT INTO products
+		VALUES($1, $2, $3)
+		RETURNING id, name, price, stock
+	`
+	var product model.Product
+	if err := p.pool.QueryRow(ctx, query, product.Name, product.Price, product.Stock).Scan(
+		&product.ID,
+		&product.Name,
+		&product.Price,
+		&product.Stock,
+	); err != nil {
+		return model.Product{}, err
+	}
+	return product, nil
 }
 
 func (p ProductRepository) Get(productID int64) (*model.Product, bool) {

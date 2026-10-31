@@ -45,7 +45,7 @@ func (p *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	product, err := p.products.AddNewProduct(r.Context(), request.ID, request.Name, request.Price, request.Stock)
+	product, err := p.products.AddNewProduct(r.Context(), request.Name, request.Price, request.Stock)
 	if err != nil{
 		if errors.Is(err, service.ErrInvalidName) || errors.Is(err, service.ErrInvalidPrice) || errors.Is(err, service.ErrInvalidStock) {
 			writeError(w, http.StatusBadRequest, err.Error())
