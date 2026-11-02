@@ -1,8 +1,10 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"sort"
+
 	"github.com/vanchaooo/go-marketplace/internal/model"
 	"github.com/vanchaooo/go-marketplace/internal/repository"
 )
@@ -27,6 +29,7 @@ func userCart(
 }
 
 func buildOrderItem(
+	ctx context.Context,
 	cart *model.Cart,
 	products *repository.ProductRepository,
 	stock bool,
@@ -34,15 +37,15 @@ func buildOrderItem(
 	items := make([]model.OrderItem, 0, len(cart.Items))
 
 	for productID, quantity := range cart.Items {
-		product, ok := products.Get(productID)
-		if !ok {
+		product, err := products.Get(ctx, productID)
+		if err != nil {
 			return nil, false
 		}
 		if stock && !product.IsAvailable(quantity) {
 			return nil, false
 		}
 
-		item, ok := model.NewOrderItem(*product, quantity)
+		item, ok := model.NewOrderItem(product, quantity)
 		if !ok {
 			return nil, false
 		}

@@ -1,8 +1,10 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"math"
+
 	"github.com/vanchaooo/go-marketplace/internal/model"
 	"github.com/vanchaooo/go-marketplace/internal/repository"
 )
@@ -34,7 +36,7 @@ func NewOrderService(
 	}
 }
 
-func (o *OrderService) MakeOrder(userID int64) (int64, bool) {
+func (o *OrderService) MakeOrder(ctx context.Context, userID int64) (int64, bool) {
 	cart, ok := userCart(o.users, o.carts, userID)
 	if !ok {
 		return 0, false
@@ -49,7 +51,7 @@ func (o *OrderService) MakeOrder(userID int64) (int64, bool) {
 		return 0, false
 	}
 
-	items, ok := buildOrderItem(cart, o.products, true)
+	items, ok := buildOrderItem(ctx, cart, o.products, true)
 	if !ok {
 		return 0, false
 	}
@@ -74,7 +76,7 @@ func (o *OrderService) MakeOrder(userID int64) (int64, bool) {
 
 	wallet.Withdraw(total)
 	for _, item := range items {
-		product, _ := o.products.Get(item.ProductID)
+		product, _ := o.products.Get(ctx, item.ProductID)
 		product.Reserve(item.Quantity)
 	}
 	cart.Clear()
@@ -84,7 +86,7 @@ func (o *OrderService) MakeOrder(userID int64) (int64, bool) {
 	return orderID, true
 }
 
-func (s *OrderService) CancelOrder(userID, orderID int64) bool {
+func (s *OrderService) CancelOrder(ctx context.Context, userID, orderID int64) bool {
 	if !s.users.Exists(userID) {
 		return false
 	}
@@ -107,8 +109,8 @@ func (s *OrderService) CancelOrder(userID, orderID int64) bool {
 		return false
 	}
 	for _, item := range order.Product {
-		product, exists := s.products.Get(item.ProductID)
-		if !exists {
+		product, err := s.products.Get(ctx, item.ProductID)
+		if err != nil{
 			return false
 		}
 		if product.Stock > math.MaxInt64-item.Quantity {
@@ -117,7 +119,7 @@ func (s *OrderService) CancelOrder(userID, orderID int64) bool {
 	}
  
 	for _, item := range order.Product {
-		product, _ := s.products.Get(item.ProductID)
+		product, _ := s.products.Get(ctx, item.ProductID)
 		product.AddStock(item.Quantity)
 	}
 	wallet.TopUp(order.Total)

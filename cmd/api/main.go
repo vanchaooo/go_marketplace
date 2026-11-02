@@ -42,17 +42,22 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", handler.Health)
-
-
 	mux.HandleFunc("POST /api/v1/products", productHandler.CreateProduct)
 	mux.HandleFunc("GET /api/v1/products", productHandler.GetAllProducts)
 	mux.HandleFunc("GET /api/v1/products/{id}", productHandler.GetProduct)
 	mux.HandleFunc("PUT /api/v1/products/{id}", productHandler.UpdateProduct)
 	mux.HandleFunc("DELETE /api/v1/products/{id}", productHandler.DeleteProduct)
 
-	mux.HandleFunc("POST /products", productHandler.CreateProduct)
-	mux.HandleFunc("GET /products", productHandler.GetAllProducts)
-	mux.HandleFunc("GET /products/{id}", productHandler.GetProduct)
-	mux.HandleFunc("PUT /products/{id}", productHandler.UpdateProduct)
-	mux.HandleFunc("DELETE /products/{id}", productHandler.DeleteProduct)
+
+
+	// Сервер
+	server := &http.Server{
+		Addr:    config.HTTPAddr,
+		Handler: mux,
+	}
+
+	log.Printf("listening on %s", config.HTTPAddr)
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("server: %v", err)
+	}
 }

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"errors"
 	"net/http"
 	"strconv"
@@ -54,9 +55,10 @@ func handleServiceErrors(w http.ResponseWriter, err error) {
 	
 		case
 			errors.Is(err, service.ErrProductNotFound):
-			writeError(w, http.StatusBadRequest, err.Error())
+			writeError(w, http.StatusNotFound, err.Error())
 
 		default:
+			log.Println("internal error:", err)
 			writeError(w, http.StatusInternalServerError, "внутренняя ошибка")
 	}
 }
@@ -67,7 +69,7 @@ func parseID(r *http.Request) (int64, error) {
 
 func (p *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	var request createProductRequest
-	if err := decodeJSON(r, request); err != nil {
+	if err := decodeJSON(r, &request); err != nil {
 		writeError(w, http.StatusBadRequest, "некорректный JSON")
 		return
 	}

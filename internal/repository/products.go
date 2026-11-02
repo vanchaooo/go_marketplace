@@ -24,7 +24,7 @@ func (p ProductRepository) Add(ctx context.Context, newProduct *model.Product) (
 		RETURNING id, name, price, stock
 	`
 	var product model.Product
-	if err := p.pool.QueryRow(ctx, query, product.Name, product.Price, product.Stock).Scan(
+	if err := p.pool.QueryRow(ctx, query, newProduct.Name, newProduct.Price, newProduct.Stock).Scan(
 		&product.ID,
 		&product.Name,
 		&product.Price,
@@ -40,6 +40,7 @@ func (p ProductRepository) Update(ctx context.Context, product model.Product) (m
 		UPDATE products
 		SET name = $2, price = $3, stock = $4
 		WHERE id = $1
+		RETURNING id, name, price, stock
 	`
 	var updatedProduct model.Product
 	if err := p.pool.QueryRow(ctx, query, product.ID, product.Name, product.Price, product.Stock).Scan(
@@ -76,6 +77,7 @@ func (p ProductRepository) GetAll(ctx context.Context) ([]model.Product, error) 
 	const query = `
 		SELECT *
 		FROM products
+		ORDER BY id
 	`
 	var productsList []model.Product
 
@@ -126,5 +128,5 @@ func (p ProductRepository) Exists(ctx context.Context, productID int64) (bool, e
 	if err := p.pool.QueryRow(ctx, query, productID).Scan(&exist); err != nil {
 		return false, err
 	}
-	return true, nil
+	return exist, nil
 }
