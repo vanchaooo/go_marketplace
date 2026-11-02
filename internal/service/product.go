@@ -5,7 +5,6 @@ import (
 	"math"
 	"strings"
 	"unicode/utf8"
-
 	"github.com/vanchaooo/go-marketplace/internal/model"
 	"github.com/vanchaooo/go-marketplace/internal/repository"
 )
@@ -45,42 +44,73 @@ func (p *ProductService) AddNewProduct(ctx context.Context, name string, price, 
 	return result, nil
 }
 
-func (p *ProductService) ChangeProductPrice(productID, newPrice int64) bool {
-	product, ok := p.products.Get(productID)
-	if !ok {
-		return false
+func (p *ProductService) UpdateProduct(ctx context.Context, productID int64, name string, price, stock int64) (model.Product, error) {
+	name = strings.TrimSpace(name)
+	if length := utf8.RuneCountInString(name); length < 1 || length > 200 {
+		return model.Product{}, ErrInvalidName
+	}
+	if price < 0 || price > math.MaxInt64 {
+		return model.Product{}, ErrInvalidPrice
+	}
+	if stock < 0 || stock > math.MaxInt64 {
+		return model.Product{}, ErrInvalidStock
 	}
 
-	return product.SetPrice(newPrice)
+	updProduct := model.Product {
+		ID: productID,
+		Name: name,
+		Price: price,
+		Stock: stock,
+	}
+	updatedProduct, err := p.products.Update(ctx, updProduct)
+	if err != nil {
+		return model.Product{}, err
+	}
+	return updatedProduct, nil
 }
 
-func (p *ProductService) ChangeProductStock(productID, newStock int64) bool {
-	product, ok := p.products.Get(productID)
-	if !ok {
-		return false
+func (p *ProductService) DeleteProduct(ctx context.Context, productID int64) error {
+	if productID <= 0 {
+		return ErrProductNotFound
+	}
+	exist, err := p.products.Exists(ctx, productID)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return ErrProductNotFound
 	}
 
-	return product.SetStock(newStock)
+	ok := p.products.Delete(ctx, productID)
+	if ok != nil {
+		return ok
+	}
+	return nil
 }
 
-func (p *ProductService) RenameProduct(productID int64, newName string) bool {
-	product, ok := p.products.Get(productID)
-	if !ok {
-		return false
+func (p *ProductService) GetProduct(ctx context.Context, productID int64) (model.Product, error) {
+	if productID <= 0 {
+		return model.Product{}, ErrProductNotFound
+	}
+	exist, err := p.products.Exists(ctx, productID)
+	if err != nil {
+		return model.Product{}, err
+	}
+	if !exist {
+		return model.Product{}, ErrProductNotFound
 	}
 
-	return product.Rename(newName)
-}
-
-func (p *ProductService) GetProduct(productID int64) (model.Product, bool) {
-	product, ok := p.products.Get(productID)
-	if !ok {
-		return model.Product{}, false
+	product, err := p.products.Get(ctx, productID)
+	if err != nil {
+		return model.Product{}, err
 	}
-
-	return *product, true
+	return product, nil
 }
 
-func (p *ProductService) SearchProduct(name string) []int64 {
-	return p.products.Search(name)
+func (p *ProductService) GetAllProducts(ctx context.Context) ([]model.Product, error) {
+	products, err := p.products.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
 }

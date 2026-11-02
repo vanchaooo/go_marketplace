@@ -1,5 +1,9 @@
 package model
 
+import (
+	"time"
+)
+
 const (
 	StatusPaid      = "Paid"
 	StatusCancelled = "Cancelled"
@@ -8,6 +12,7 @@ const (
 type User struct {
 	ID int64
 	Name string
+	CreatedAt time.Time
 }
 
 type Wallet struct {

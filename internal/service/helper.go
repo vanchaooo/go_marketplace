@@ -7,9 +7,11 @@ import (
 	"github.com/vanchaooo/go-marketplace/internal/repository"
 )
 
+var ErrNotFound = errors.New("По вашему запросу ничего не найдено.")
 var ErrInvalidName = errors.New("Имя должно содержать от 1 до 200 символов.")
 var ErrInvalidPrice = errors.New("Цена должна быть не менее 0 рублей.")
 var ErrInvalidStock = errors.New("Количество должно быть не менее 0 штук.")
+var ErrProductNotFound = errors.New("Продукт не был найден.")
 
 
 func userCart(
