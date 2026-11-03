@@ -111,7 +111,7 @@ func (p ProductRepository) Delete(ctx context.Context, productID int64) error {
 		return err
 	}
 	if response.RowsAffected() == 0 {
-		return errors.New("Продукт не был найден.")
+		return errors.New("Продукт с таким ID не найден.")
 	}
 	return nil
 }

@@ -1,58 +1,101 @@
 package repository
 
 import (
-	"math"
-	"strings"
-	"slices"
+	"errors"
+	"context"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/vanchaooo/go-marketplace/internal/model"
 )
 
 type UserRepository struct {
-	users map[int64]*model.User
-	nextID int64
+	pool *pgxpool.Pool
 }
 
-func NewUserRepository() *UserRepository {
+func NewUserRepository(pool *pgxpool.Pool) *UserRepository {
 	return &UserRepository {
-		users: make(map[int64]*model.User),
-		nextID: 1,
+		pool: pool,
 	}
 }
 
-func (u *UserRepository) Add(user *model.User) (int64, bool) {
-	if u.nextID <= 0 || u.nextID == math.MaxInt64 {
-		return 0, false
+func (u *UserRepository) Add(ctx context.Context, name string) (model.User, error) {
+	const query = `
+		INSERT INTO users (name)
+		VALUES $1
+		RETURNING id, name, created_at
+	`
+
+	var user model.User
+	if err := u.pool.QueryRow(ctx, query, name).Scan(
+		&user.ID,
+		&user.Name,
+		&user.CreatedAt,
+	); err != nil {
+		return model.User{}, err
 	}
- 
-	user.ID = u.nextID
-	u.users[user.ID] = user
-	u.nextID++
-	return user.ID, true
+	return user, nil
 }
 
-func (u *UserRepository) Get(userID int64) (*model.User, bool) {
-	user, ok := u.users[userID]
-	return user, ok
-}
-
-func (u *UserRepository) GetEveryoneByName(name string) []int64 {
-	name = strings.ToLower(name)
-	result := []int64{}
-
-	for id, user := range u.users {
-		if strings.Contains(strings.ToLower(user.Name), name) {
-			result = append(result, id)
-		}
+func (u *UserRepository) Get(ctx context.Context, userID int64) (model.User, error) {
+	const query = `
+		SELECT id, name, created_at
+		FROM users
+		WHERE id = $1
+	`
+	var user model.User
+	if err := u.pool.QueryRow(ctx, query, userID).Scan(
+		&user.ID,
+		&user.Name,
+		&user.CreatedAt,
+	); err != nil {
+		return model.User{}, err
 	}
-	slices.Sort(result)
-	return result
+	return user, nil
 }
 
-func (u *UserRepository) Delete(userID int64) {
-	delete(u.users, userID)
+func (u *UserRepository) Rename(ctx context.Context, userID int64, newName string) (model.User, error) {
+	const query = `
+		UPDATE users
+		SET name = $2
+		WHERE id = $1
+		RETURNING id, name, created_at
+	`
+	var renamedUser model.User
+	if err := u.pool.QueryRow(ctx, query, userID, newName).Scan(
+		&renamedUser.ID,
+		&renamedUser.Name,
+		&renamedUser.CreatedAt,
+	); err != nil {
+		return model.User{}, err
+	}
+	return renamedUser, nil
 }
 
-func (u *UserRepository) Exists(userID int64) bool {
-	_, ok := u.users[userID]
-	return ok
+func (u *UserRepository) Delete(ctx context.Context, userID int64) error {
+	const query = `
+		DELETE FROM users
+		WHERE id = %1
+	`
+	response, err := u.pool.Exec(ctx, query, userID)
+	if err != nil {
+		return err
+	}
+	if response.RowsAffected() == 0 {
+		return errors.New("Пользоватесь с таким ID не найден.")
+	}
+	return nil
+}
+
+func (u *UserRepository) Exists(ctx context.Context, userID int64) (bool, error) {
+	const query = `
+		SELECT EXISTS (
+			SELECT id
+			FROM users
+			WHERE id = $1
+		)
+	`
+	var exist bool
+	if err := u.pool.QueryRow(ctx, query, userID).Scan(&exist); err != nil {
+		return false, err
+	}
+	return exist, nil
 }

@@ -1,97 +1,88 @@
 package service
 
 import (
+	"context"
+	"unicode/utf8"
 	"github.com/vanchaooo/go-marketplace/internal/model"
 	"github.com/vanchaooo/go-marketplace/internal/repository"
 )
 
 type UserService struct {
 	users *repository.UserRepository
-	wallets *repository.WalletRepository
-	carts *repository.CartRepository
-	orders *repository.OrderRepository
 }
 
-func NewUserService(
-	users *repository.UserRepository,
-	wallets *repository.WalletRepository,
-	carts *repository.CartRepository,
-	orders *repository.OrderRepository,	
-) *UserService {
+func NewUserService(users *repository.UserRepository) *UserService {
 	return &UserService{
 		users: users,
-		wallets: wallets,
-		carts: carts,
-		orders: orders,
 	}
 }
 
-func (u *UserService) AddUser(name string) (int64, bool) {
-	user, ok := model.NewUser(name)
-	if !ok {
-		return 0, false
+func (u *UserService) AddUser(ctx context.Context, name string) (model.User, error) {
+	if length := utf8.RuneCountInString(name); length < 1 || length > 200 {
+		return model.User{}, ErrInvalidName
 	}
-
-	userID, ok := u.users.Add(&user)
-	if !ok {
-		return 0, false
+	response, err := u.users.Add(ctx, name)
+	if err != nil {
+		return model.User{}, err
 	}
-
-	wallet, ok := model.NewWallet(userID)
-	if !ok {
-		return 0, false
-	}
-
-	cart, ok := model.NewCart(userID)
-	if !ok {
-		return 0, false
-	}
-
-	u.wallets.Add(&wallet)
-	u.carts.Add(&cart)
-	return userID, true
+	return response, nil
 }
 
-func (u *UserService) Renameuser(userID int64, newName string) bool {
-	user, ok := u.users.Get(userID)
-	if !ok {
-		return false
+func (u *UserService) Renameuser(ctx context.Context, userID int64, newName string) (model.User, error) {
+	if userID < 0 {
+		return model.User{}, ErrInvalidID
+	}
+	if length := utf8.RuneCountInString(newName); length < 1 || length > 200 {
+		return model.User{}, ErrInvalidName
+	}
+	exist, err := u.users.Exists(ctx, userID)
+	if err != nil {
+		return model.User{}, err
+	}
+	if !exist {
+		return model.User{}, ErrUserNotFound
 	}
 
-	return user.Rename(newName)
+	renamedUser, err := u.users.Rename(ctx, userID, newName)
+	if err != nil {
+		return model.User{}, nil
+	}
+	return renamedUser, nil
 }
 
-func (u *UserService) GetUser(userID int64) (model.User, bool) {
-	user, ok := u.users.Get(userID)
-	if !ok {
-		return model.User{}, false
+func (u *UserService) GetUser(ctx context.Context, userID int64) (model.User, error) {
+	if userID < 0 {
+		return model.User{}, ErrInvalidID
+	}
+	exist, err := u.users.Exists(ctx, userID)
+	if err != nil {
+		return model.User{}, err
+	}
+	if !exist {
+		return model.User{}, ErrUserNotFound
 	}
 
-	return *user, true
+	user, err := u.users.Get(ctx, userID)
+	if err != nil {
+		return model.User{}, err
+	}
+	return user, nil
 }
 
-func (u *UserService) DeleteUser(userID int64) bool {
-	if !u.users.Exists(userID) {
-		return false
+func (u *UserService) DeleteUser(ctx context.Context, userID int64) error {
+	if userID < 0 {
+		return ErrInvalidID
+	}
+	exist, err := u.users.Exists(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return ErrUserNotFound
 	}
 
-	wallet, ok := u.wallets.Get(userID)
-	if !ok || wallet.Balance != 0 {
-		return false
+	if err := u.users.Delete(ctx, userID); err != nil {
+		return err
 	}
- 
-	for _, order := range u.orders.GetAll(userID) {
-		if order.IsPaid() {
-			return false
-		}
-	}
- 
-	u.users.Delete(userID)
-	u.wallets.Delete(userID)
-	u.carts.Delete(userID)
-	return true
-}
-
-func (u *UserService) FindEveryoneByName(name string) []int64 {
-	return u.users.GetEveryoneByName(name)
+	return nil
 }

@@ -4,25 +4,30 @@ import (
 	"context"
 	"errors"
 	"sort"
-
 	"github.com/vanchaooo/go-marketplace/internal/model"
 	"github.com/vanchaooo/go-marketplace/internal/repository"
 )
 
 var ErrNotFound = errors.New("По вашему запросу ничего не найдено.")
+var ErrInvalidID = errors.New("Некорректный ID.")
 var ErrInvalidName = errors.New("Имя должно содержать от 1 до 200 символов.")
 var ErrInvalidPrice = errors.New("Цена должна быть не менее 0 рублей.")
 var ErrInvalidStock = errors.New("Количество должно быть не менее 0 штук.")
-var ErrProductNotFound = errors.New("Продукт не был найден.")
-
+var ErrProductNotFound = errors.New("Продукт не найден.")
+var ErrUserNotFound = errors.New("Пользователь не найден.")
 
 func userCart(
+	ctx context.Context,
 	users *repository.UserRepository,
 	carts *repository.CartRepository,
 	userID int64,
 ) (*model.Cart, bool) {
-	if !users.Exists(userID) {
-		return nil, false
+	exist, err := users.Exists(ctx, userID)
+	if err != nil {
+		return &model.Cart{}, false
+	}
+	if !exist {
+		return &model.Cart{}, false
 	}
  
 	return carts.Get(userID)
