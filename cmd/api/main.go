@@ -40,6 +40,10 @@ func main() {
 	productService := service.NewProductService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
 
+	userRepository := repository.NewUserRepository(pool)
+	userService := service.NewUserService(userRepository)
+	userHandler := handler.NewUserHandler(userService)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", handler.Health)
 	mux.HandleFunc("POST /api/v1/products", productHandler.CreateProduct)
@@ -47,6 +51,11 @@ func main() {
 	mux.HandleFunc("GET /api/v1/products/{id}", productHandler.GetProduct)
 	mux.HandleFunc("PUT /api/v1/products/{id}", productHandler.UpdateProduct)
 	mux.HandleFunc("DELETE /api/v1/products/{id}", productHandler.DeleteProduct)
+
+	mux.HandleFunc("POST /api/v1/users", userHandler.CreateUser)
+	mux.HandleFunc("GET /api/v1/users/{id}", userHandler.GetUser)
+	mux.HandleFunc("PATCH /api/v1/users/{id}", userHandler.RenameUser)
+	mux.HandleFunc("DELETE /api/v1/users/{id}", userHandler.DeleteUser)
 
 
 
