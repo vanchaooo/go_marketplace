@@ -26,10 +26,10 @@ func (p *ProductService) AddNewProduct(ctx context.Context, name string, price, 
 	if length := utf8.RuneCountInString(name); length < 1 || length > 200 {
 		return model.Product{}, ErrInvalidName
 	}
-	if price < 0 || price > math.MaxInt64 {
+	if price <= 0 || price > math.MaxInt64 {
 		return model.Product{}, ErrInvalidPrice
 	}
-	if stock < 0 || stock > math.MaxInt64 {
+	if stock <= 0 || stock > math.MaxInt64 {
 		return model.Product{}, ErrInvalidStock
 	}
 	product := model.Product {
@@ -46,16 +46,16 @@ func (p *ProductService) AddNewProduct(ctx context.Context, name string, price, 
 
 func (p *ProductService) UpdateProduct(ctx context.Context, productID int64, name string, price, stock int64) (model.Product, error) {
 	name = strings.TrimSpace(name)
-	if productID < 0 {
+	if productID <= 0 {
 		return model.Product{}, ErrInvalidID
 	}
 	if length := utf8.RuneCountInString(name); length < 1 || length > 200 {
 		return model.Product{}, ErrInvalidName
 	}
-	if price < 0 || price > math.MaxInt64 {
+	if price <= 0 || price > math.MaxInt64 {
 		return model.Product{}, ErrInvalidPrice
 	}
-	if stock < 0 || stock > math.MaxInt64 {
+	if stock <= 0 || stock > math.MaxInt64 {
 		return model.Product{}, ErrInvalidStock
 	}
 	exist, err := p.products.Exists(ctx, productID)

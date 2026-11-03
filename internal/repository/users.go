@@ -20,7 +20,7 @@ func NewUserRepository(pool *pgxpool.Pool) *UserRepository {
 func (u *UserRepository) Add(ctx context.Context, name string) (model.User, error) {
 	const query = `
 		INSERT INTO users (name)
-		VALUES $1
+		VALUES ($1)
 		RETURNING id, name, created_at
 	`
 
@@ -73,7 +73,7 @@ func (u *UserRepository) Rename(ctx context.Context, userID int64, newName strin
 func (u *UserRepository) Delete(ctx context.Context, userID int64) error {
 	const query = `
 		DELETE FROM users
-		WHERE id = %1
+		WHERE id = $1
 	`
 	response, err := u.pool.Exec(ctx, query, userID)
 	if err != nil {

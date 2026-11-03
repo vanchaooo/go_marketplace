@@ -15,6 +15,7 @@ func parseID(r *http.Request) (int64, error) {
 func handleServiceErrors(w http.ResponseWriter, err error) {
 	switch {
 		case
+			errors.Is(err, service.ErrInvalidID),
 			errors.Is(err, service.ErrInvalidName),
 			errors.Is(err, service.ErrInvalidPrice),
 			errors.Is(err, service.ErrInvalidStock):

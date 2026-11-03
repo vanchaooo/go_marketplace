@@ -28,8 +28,8 @@ func (u *UserService) AddUser(ctx context.Context, name string) (model.User, err
 	return response, nil
 }
 
-func (u *UserService) Renameuser(ctx context.Context, userID int64, newName string) (model.User, error) {
-	if userID < 0 {
+func (u *UserService) RenameUser(ctx context.Context, userID int64, newName string) (model.User, error) {
+	if userID <= 0 {
 		return model.User{}, ErrInvalidID
 	}
 	if length := utf8.RuneCountInString(newName); length < 1 || length > 200 {
@@ -51,7 +51,7 @@ func (u *UserService) Renameuser(ctx context.Context, userID int64, newName stri
 }
 
 func (u *UserService) GetUser(ctx context.Context, userID int64) (model.User, error) {
-	if userID < 0 {
+	if userID <= 0 {
 		return model.User{}, ErrInvalidID
 	}
 	exist, err := u.users.Exists(ctx, userID)
@@ -70,7 +70,7 @@ func (u *UserService) GetUser(ctx context.Context, userID int64) (model.User, er
 }
 
 func (u *UserService) DeleteUser(ctx context.Context, userID int64) error {
-	if userID < 0 {
+	if userID <= 0 {
 		return ErrInvalidID
 	}
 	exist, err := u.users.Exists(ctx, userID)

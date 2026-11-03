@@ -61,13 +61,13 @@ func (u *UserHandler) RenameUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var request createUserRequest
+	var request renameUserRequest
 	if err := decodeJSON(r, &request); err != nil {
 		writeError(w, http.StatusBadRequest, "некорректный JSON")
 		return
 	}
 
-	user, err := u.users.Renameuser(r.Context(), id, request.Name)
+	user, err := u.users.RenameUser(r.Context(), id, request.Name)
 	if err != nil {
 		handleServiceErrors(w, err)
 		return
