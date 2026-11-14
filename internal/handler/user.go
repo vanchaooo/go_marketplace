@@ -38,22 +38,6 @@ func userToResponse(user model.User) userResponse {
 	}
 }
 
-func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
-	var request createUserRequest
-	if err := decodeJSON(r, &request); err != nil {
-		writeError(w, http.StatusBadRequest, "некорректный JSON")
-		return
-	}
-
-	user, err := u.users.AddUser(r.Context(), request.Name)
-	if err != nil {
-		handleServiceErrors(w, err)
-		return
-	}
-
-	_ = writeJSON(w, http.StatusCreated, userToResponse(user))
-}
-
 func (u *UserHandler) RenameUser(w http.ResponseWriter, r *http.Request) {
 	id, err := parseID(r)
 	if err != nil {

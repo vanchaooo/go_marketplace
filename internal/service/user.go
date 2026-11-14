@@ -17,17 +17,6 @@ func NewUserService(users *repository.UserRepository) *UserService {
 	}
 }
 
-func (u *UserService) AddUser(ctx context.Context, name string) (model.User, error) {
-	if length := utf8.RuneCountInString(name); length < 1 || length > 200 {
-		return model.User{}, ErrInvalidName
-	}
-	response, err := u.users.Add(ctx, name)
-	if err != nil {
-		return model.User{}, err
-	}
-	return response, nil
-}
-
 func (u *UserService) RenameUser(ctx context.Context, userID int64, newName string) (model.User, error) {
 	if userID <= 0 {
 		return model.User{}, ErrInvalidID

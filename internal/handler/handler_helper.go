@@ -26,6 +26,15 @@ func handleServiceErrors(w http.ResponseWriter, err error) {
 			errors.Is(err, service.ErrProductNotFound):
 			writeError(w, http.StatusNotFound, err.Error())
 
+		case errors.Is(err, service.ErrInvalidCredentials),
+			errors.Is(err, service.ErrInvalidToken):
+			writeError(w, http.StatusUnauthorized, err.Error())
+		case errors.Is(err, service.ErrEmailTaken):
+			writeError(w, http.StatusConflict, err.Error())
+		case errors.Is(err, service.ErrInvalidEmail),
+			errors.Is(err, service.ErrInvalidPassword):
+			writeError(w, http.StatusBadRequest, err.Error())
+
 		default:
 			log.Println("internal error:", err)
 			writeError(w, http.StatusInternalServerError, "внутренняя ошибка")

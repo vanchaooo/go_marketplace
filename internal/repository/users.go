@@ -1,10 +1,18 @@
 package repository
 
 import (
-	"errors"
 	"context"
+	"errors"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/vanchaooo/go-marketplace/internal/model"
+)
+
+var (
+	ErrEmailTaken = errors.New("email уже занят")
+	ErrUserNotFound = errors.New("Пользователь не найден.")
 )
 
 type UserRepository struct {
@@ -17,19 +25,23 @@ func NewUserRepository(pool *pgxpool.Pool) *UserRepository {
 	}
 }
 
-func (u *UserRepository) Add(ctx context.Context, name string) (model.User, error) {
+func (u *UserRepository) Add(ctx context.Context, name, email, password_hash string) (model.User, error) {
 	const query = `
-		INSERT INTO users (name)
-		VALUES ($1)
+		INSERT INTO users (name, email, password_hash)
+		VALUES ($1, $2, $3)
 		RETURNING id, name, created_at
 	`
 
 	var user model.User
-	if err := u.pool.QueryRow(ctx, query, name).Scan(
+	if err := u.pool.QueryRow(ctx, query, name, email, password_hash).Scan(
 		&user.ID,
 		&user.Name,
 		&user.CreatedAt,
 	); err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return model.User{}, ErrEmailTaken
+		}
 		return model.User{}, err
 	}
 	return user, nil
@@ -50,6 +62,25 @@ func (u *UserRepository) Get(ctx context.Context, userID int64) (model.User, err
 		return model.User{}, err
 	}
 	return user, nil
+}
+
+func (u *UserRepository) GetWithCredentials(ctx context.Context, email string) (int64, string, error) {
+	const query = `
+		SELECT id
+		FROM users
+		WHERE email = $1
+	`
+	var (
+		id int64
+		hash string
+	)
+	if err := u.pool.QueryRow(ctx, query, email).Scan(&id, &hash); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return 0, "", ErrUserNotFound
+		}
+		return 0, "", err
+	}
+	return id, hash, nil
 }
 
 func (u *UserRepository) Rename(ctx context.Context, userID int64, newName string) (model.User, error) {

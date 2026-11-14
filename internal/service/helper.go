@@ -8,13 +8,20 @@ import (
 	"github.com/vanchaooo/go-marketplace/internal/repository"
 )
 
-var ErrNotFound = errors.New("По вашему запросу ничего не найдено.")
-var ErrInvalidID = errors.New("Некорректный ID.")
-var ErrInvalidName = errors.New("Имя должно содержать от 1 до 200 символов.")
-var ErrInvalidPrice = errors.New("Цена должна быть не менее 0 рублей.")
-var ErrInvalidStock = errors.New("Количество должно быть не менее 0 штук.")
-var ErrProductNotFound = errors.New("Продукт не найден.")
-var ErrUserNotFound = errors.New("Пользователь не найден.")
+var (
+	ErrNotFound = errors.New("По вашему запросу ничего не найдено.")
+	ErrInvalidID = errors.New("Некорректный ID.") 
+	ErrInvalidName = errors.New("Имя должно содержать от 1 до 200 символов.")
+	ErrInvalidPrice = errors.New("Цена должна быть не менее 0 рублей.")
+	ErrInvalidStock = errors.New("Количество должно быть не менее 0 штук.")
+	ErrProductNotFound = errors.New("Продукт не найден.")
+	ErrUserNotFound = errors.New("Пользователь не найден.")
+	ErrInvalidCredentials = errors.New("неверный email или пароль")
+	ErrInvalidToken = errors.New("недействительный токен")
+	ErrEmailTaken = errors.New("email уже занят")
+	ErrInvalidEmail = errors.New("некорректный email")
+	ErrInvalidPassword = errors.New("пароль должен быть от 8 до 72 символов")
+)
 
 func userCart(
 	ctx context.Context,

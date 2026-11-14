@@ -29,7 +29,7 @@ func (t *RefreshTokenRepository) Add(ctx context.Context, userID int64, hash str
 	return err
 }
 
-func (t *RefreshTokenRepository) Verification(ctx context.Context, userID int64, hash string) (int64, error) {
+func (t *RefreshTokenRepository) Verification(ctx context.Context, hash string) (int64, error) {
 	const query = `
 		DELETE FROM refresh_tokens
 		WHERE token_hash = $1 and expires_at > now()

@@ -52,7 +52,6 @@ func main() {
 	mux.HandleFunc("PUT /api/v1/products/{id}", productHandler.UpdateProduct)
 	mux.HandleFunc("DELETE /api/v1/products/{id}", productHandler.DeleteProduct)
 
-	mux.HandleFunc("POST /api/v1/users", userHandler.CreateUser)
 	mux.HandleFunc("GET /api/v1/users/{id}", userHandler.GetUser)
 	mux.HandleFunc("PATCH /api/v1/users/{id}", userHandler.RenameUser)
 	mux.HandleFunc("DELETE /api/v1/users/{id}", userHandler.DeleteUser)
