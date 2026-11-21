@@ -17,7 +17,7 @@ type TokenManager struct {
 	TTL time.Duration
 }
 
-func NewTokenManaget(secret string, ttl time.Duration) *TokenManager {
+func NewTokenManager(secret string, ttl time.Duration) *TokenManager {
 	return &TokenManager{Secret: secret, TTL: ttl}
 }
 

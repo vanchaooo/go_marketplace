@@ -11,6 +11,7 @@ import (
 	"github.com/vanchaooo/go-marketplace/internal/handler"
 	"github.com/vanchaooo/go-marketplace/internal/repository"
 	"github.com/vanchaooo/go-marketplace/internal/service"
+	"github.com/vanchaooo/go-marketplace/internal/auth"
 )
 
 func main() {
@@ -44,6 +45,11 @@ func main() {
 	userService := service.NewUserService(userRepository)
 	userHandler := handler.NewUserHandler(userService)
 
+	tokenManager := auth.NewTokenManager(config.JWTSecret, 15*time.Minute)
+	refreshRepository := repository.NewRefreshTokenRepository(pool)
+	authService := service.NewAuthService(userRepository, refreshRepository, tokenManager, 30*24*time.Hour)
+	authHandler := handler.NewAuthHandler(authService)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", handler.Health)
 	mux.HandleFunc("POST /api/v1/products", productHandler.CreateProduct)
@@ -55,6 +61,11 @@ func main() {
 	mux.HandleFunc("GET /api/v1/users/{id}", userHandler.GetUser)
 	mux.HandleFunc("PATCH /api/v1/users/{id}", userHandler.RenameUser)
 	mux.HandleFunc("DELETE /api/v1/users/{id}", userHandler.DeleteUser)
+
+	mux.HandleFunc("POST /api/v1/auth/register", authHandler.Register)
+	mux.HandleFunc("POST /api/v1/auth/login", authHandler.Login)
+	mux.HandleFunc("POST /api/v1/auth/refresh", authHandler.Refresh)
+	mux.HandleFunc("POST /api/v1/auth/logout", authHandler.Logout)
 
 
 

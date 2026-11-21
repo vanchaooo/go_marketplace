@@ -26,12 +26,17 @@ func handleServiceErrors(w http.ResponseWriter, err error) {
 			errors.Is(err, service.ErrProductNotFound):
 			writeError(w, http.StatusNotFound, err.Error())
 
-		case errors.Is(err, service.ErrInvalidCredentials),
+		case 
+			errors.Is(err, service.ErrInvalidCredentials),
 			errors.Is(err, service.ErrInvalidToken):
 			writeError(w, http.StatusUnauthorized, err.Error())
-		case errors.Is(err, service.ErrEmailTaken):
+
+		case 
+			errors.Is(err, service.ErrEmailTaken):
 			writeError(w, http.StatusConflict, err.Error())
-		case errors.Is(err, service.ErrInvalidEmail),
+
+		case 
+			errors.Is(err, service.ErrInvalidEmail),
 			errors.Is(err, service.ErrInvalidPassword):
 			writeError(w, http.StatusBadRequest, err.Error())
 
