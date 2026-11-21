@@ -59,8 +59,8 @@ func (a *AuthService) Register(ctx context.Context, name, email, password string
 	}
 	user, err := a.users.Add(ctx, name, email, string(passhash))
 	if err != nil {
-		if errors.As(err, repository.ErrEmailTaken) {
-			return model.User{}, err
+		if errors.Is(err, repository.ErrEmailTaken) {
+			return model.User{}, ErrEmailTaken
 		}
 		return model.User{}, err
 	}
@@ -73,7 +73,7 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (TokenP
 
 	userID, hash, err := a.users.GetWithCredentials(ctx, email)
 	if err != nil {
-		if errors.As(err, repository.ErrUserNotFound) {
+		if errors.Is(err, repository.ErrUserNotFound) {
 			return TokenPair{}, ErrInvalidCredentials
 		}
 		return TokenPair{}, err
@@ -91,7 +91,7 @@ func (a *AuthService) Logout(ctx context.Context, refreshToken string) error {
 func (a *AuthService) Refresh(ctx context.Context, refreshToken string) (TokenPair, error) {
 	userID, err := a.refresh.Verification(ctx, auth.HashToken(refreshToken))
 	if err != nil {
-		if errors.As(err, repository.ErrRefreshTokenNotFound) {
+		if errors.Is(err, repository.ErrRefreshTokenNotFound) {
 			return TokenPair{}, ErrInvalidToken
 		}
 		return TokenPair{}, err

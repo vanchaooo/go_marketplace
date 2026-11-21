@@ -39,7 +39,7 @@ func handleServiceErrors(w http.ResponseWriter, err error) {
 			errors.Is(err, service.ErrInvalidEmail),
 			errors.Is(err, service.ErrInvalidPassword):
 			writeError(w, http.StatusBadRequest, err.Error())
-
+		
 		default:
 			log.Println("internal error:", err)
 			writeError(w, http.StatusInternalServerError, "внутренняя ошибка")
