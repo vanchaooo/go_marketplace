@@ -79,7 +79,7 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (TokenP
 		return TokenPair{}, err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)); err != nil {
-		return TokenPair{}, ErrInvalidPassword
+		return TokenPair{}, ErrInvalidCredentials
 	}
 	return a.newTokenPair(ctx, userID)
 }

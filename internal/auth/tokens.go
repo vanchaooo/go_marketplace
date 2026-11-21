@@ -31,7 +31,7 @@ func (m *TokenManager) NewAccessToken(userID int64) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(m.Secret)
+	return token.SignedString([]byte(m.Secret))
 }
 
 func (m *TokenManager) ParseAccessToken(tokenString string) (int64, error) {

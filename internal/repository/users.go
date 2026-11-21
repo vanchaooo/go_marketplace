@@ -66,7 +66,7 @@ func (u *UserRepository) Get(ctx context.Context, userID int64) (model.User, err
 
 func (u *UserRepository) GetWithCredentials(ctx context.Context, email string) (int64, string, error) {
 	const query = `
-		SELECT id
+		SELECT id, password_hash
 		FROM users
 		WHERE email = $1
 	`
