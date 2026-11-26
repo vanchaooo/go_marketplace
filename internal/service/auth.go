@@ -20,6 +20,7 @@ type TokenPair struct {
 
 type AuthService struct {
 	users *repository.UserRepository
+	wallets *repository.WalletRepository
 	refresh *repository.RefreshTokenRepository
 	tokens *auth.TokenManager
 	refreshTTL time.Duration
@@ -27,12 +28,14 @@ type AuthService struct {
 
 func NewAuthService(
 	users *repository.UserRepository,
+	wallets *repository.WalletRepository,
 	refresh *repository.RefreshTokenRepository,
 	tokens *auth.TokenManager,
 	refreshTTL time.Duration,
 	) *AuthService {
 		return &AuthService{
 			users: users,
+			wallets: wallets,
 			refresh: refresh,
 			tokens: tokens,
 			refreshTTL: refreshTTL,
@@ -62,6 +65,9 @@ func (a *AuthService) Register(ctx context.Context, name, email, password string
 		if errors.Is(err, repository.ErrEmailTaken) {
 			return model.User{}, ErrEmailTaken
 		}
+		return model.User{}, err
+	}
+	if _, err := a.wallets.Add(ctx, user.ID); err != nil {
 		return model.User{}, err
 	}
 	

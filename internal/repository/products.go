@@ -80,7 +80,7 @@ func (p ProductRepository) GetAll(ctx context.Context) ([]model.Product, error) 
 		ORDER BY id
 	`
 	var productsList []model.Product
-
+	
 	rows, err := p.pool.Query(ctx, query)
 	if err != nil {
 		return nil, err

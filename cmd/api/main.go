@@ -37,17 +37,20 @@ func main() {
 
 
 	// Маршрутизатор
-	productRepository := repository.NewProductRepository(pool)
-	productService := service.NewProductService(productRepository)
-	productHandler := handler.NewProductHandler(productService)
-
 	userRepository := repository.NewUserRepository(pool)
 	userService := service.NewUserService(userRepository)
 	userHandler := handler.NewUserHandler(userService)
 
+	productRepository := repository.NewProductRepository(pool)
+	productService := service.NewProductService(productRepository)
+	productHandler := handler.NewProductHandler(productService)
+
+	walletRepository := repository.NewWalletRepository(pool)
+
+
 	tokenManager := auth.NewTokenManager(config.JWTSecret, 15*time.Minute)
 	refreshRepository := repository.NewRefreshTokenRepository(pool)
-	authService := service.NewAuthService(userRepository, refreshRepository, tokenManager, 30*24*time.Hour)
+	authService := service.NewAuthService(userRepository, walletRepository, refreshRepository, tokenManager, 30*24*time.Hour)
 	authHandler := handler.NewAuthHandler(authService)
 
 	mux := http.NewServeMux()
