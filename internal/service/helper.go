@@ -9,18 +9,21 @@ import (
 )
 
 var (
-	ErrNotFound = errors.New("По вашему запросу ничего не найдено.")
-	ErrInvalidID = errors.New("Некорректный ID.") 
-	ErrInvalidName = errors.New("Имя должно содержать от 1 до 200 символов.")
-	ErrInvalidPrice = errors.New("Цена должна быть не менее 0 рублей.")
-	ErrInvalidStock = errors.New("Количество должно быть не менее 0 штук.")
-	ErrProductNotFound = errors.New("Продукт не найден.")
-	ErrUserNotFound = errors.New("Пользователь не найден.")
+	ErrNotFound = errors.New("по вашему запросу ничего не найдено")
+	ErrInvalidID = errors.New("некорректный ID") 
+	ErrInvalidName = errors.New("имя должно содержать от 1 до 200 символов")
+	ErrInvalidPrice = errors.New("цена должна быть не менее 0 рублей")
+	ErrInvalidStock = errors.New("количество должно быть не менее 0 штук")
+	ErrProductNotFound = errors.New("продукт не найден")
+	ErrUserNotFound = errors.New("пользователь не найден")
 	ErrInvalidCredentials = errors.New("неверный email или пароль")
 	ErrInvalidToken = errors.New("недействительный токен")
 	ErrEmailTaken = errors.New("email уже занят")
 	ErrInvalidEmail = errors.New("некорректный email")
 	ErrInvalidPassword = errors.New("пароль должен быть от 8 до 72 символов")
+	ErrWalletNotFound = errors.New("кошелек не найден")
+	ErrInsufficientFunds = errors.New("недостаточно средств")
+	ErrAmountNEgative = errors.New("сумма должна быть не менее 1 рубля")
 )
 
 func userCart(

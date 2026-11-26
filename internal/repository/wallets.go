@@ -37,7 +37,7 @@ func (b *WalletRepository) Add(ctx context.Context, userID int64) (model.Wallet,
 	return wallet, nil
 }
 
-func (b *WalletRepository) TopUpBalance(ctx context.Context, userID, amount int64) (model.Wallet, error) {
+func (b *WalletRepository) TopUp(ctx context.Context, userID, amount int64) (model.Wallet, error) {
 	const query = `
 		UPDATE wallets 
 		SET balance = balance + $2

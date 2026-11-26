@@ -113,6 +113,15 @@ func (u *UserRepository) Delete(ctx context.Context, userID int64) error {
 	if response.RowsAffected() == 0 {
 		return errors.New("Пользоватесь с таким ID не найден.")
 	}
+
+	walletResponse, err := u.pool.Exec(ctx, `DELETE FROM wallets WHERE user_id = $1`, userID)
+	if err != nil {
+		return err
+	}
+	if walletResponse.RowsAffected() == 0 {
+		return errors.New("Пользоватесь с таким ID не найден.")
+	}
+
 	return nil
 }
 
