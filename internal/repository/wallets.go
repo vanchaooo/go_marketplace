@@ -32,6 +32,9 @@ func (b *WalletRepository) Add(ctx context.Context, userID int64) (model.Wallet,
 		&wallet.UserID,
 		&wallet.Balance,
 	); err != nil {
+		if errors.Is(err, ErrInsufficientFunds) {
+			return model.Wallet{}, ErrInsufficientFunds
+		}
 		return model.Wallet{}, err
 	}
 	return wallet, nil

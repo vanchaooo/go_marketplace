@@ -23,7 +23,7 @@ var (
 	ErrInvalidPassword = errors.New("пароль должен быть от 8 до 72 символов")
 	ErrWalletNotFound = errors.New("кошелек не найден")
 	ErrInsufficientFunds = errors.New("недостаточно средств")
-	ErrAmountNEgative = errors.New("сумма должна быть не менее 1 рубля")
+	ErrAmountNegative = errors.New("сумма должна быть не менее 1 рубля")
 )
 
 func userCart(

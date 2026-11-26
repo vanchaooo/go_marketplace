@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"log"
 	"errors"
-	"strconv"
+	"log"
 	"net/http"
+	"strconv"
+
 	"github.com/vanchaooo/go-marketplace/internal/service"
 )
 
@@ -18,12 +19,14 @@ func handleServiceErrors(w http.ResponseWriter, err error) {
 			errors.Is(err, service.ErrInvalidID),
 			errors.Is(err, service.ErrInvalidName),
 			errors.Is(err, service.ErrInvalidPrice),
-			errors.Is(err, service.ErrInvalidStock):
+			errors.Is(err, service.ErrInvalidStock),
+			errors.Is(err, service.ErrAmountNegative):
 			writeError(w, http.StatusBadRequest, err.Error())
 	
 		case
 			errors.Is(err, service.ErrUserNotFound),
-			errors.Is(err, service.ErrProductNotFound):
+			errors.Is(err, service.ErrProductNotFound),
+			errors.Is(err, service.ErrWalletNotFound):
 			writeError(w, http.StatusNotFound, err.Error())
 
 		case 
@@ -39,6 +42,10 @@ func handleServiceErrors(w http.ResponseWriter, err error) {
 			errors.Is(err, service.ErrInvalidEmail),
 			errors.Is(err, service.ErrInvalidPassword):
 			writeError(w, http.StatusBadRequest, err.Error())
+
+		case
+			errors.Is(err, service.ErrInsufficientFunds):
+			writeError(w, http.StatusUnprocessableEntity, err.Error())
 		
 		default:
 			log.Println("internal error:", err)

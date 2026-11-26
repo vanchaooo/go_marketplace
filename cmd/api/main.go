@@ -46,6 +46,8 @@ func main() {
 	productHandler := handler.NewProductHandler(productService)
 
 	walletRepository := repository.NewWalletRepository(pool)
+	walletService := service.NewWalletService(walletRepository, userRepository)
+	walletHandler := handler.NewWalletHandler(walletService)
 
 
 	tokenManager := auth.NewTokenManager(config.JWTSecret, 15*time.Minute)
@@ -53,7 +55,18 @@ func main() {
 	authService := service.NewAuthService(userRepository, walletRepository, refreshRepository, tokenManager, 30*24*time.Hour)
 	authHandler := handler.NewAuthHandler(authService)
 
+
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("POST /api/v1/auth/register", authHandler.Register)
+	mux.HandleFunc("POST /api/v1/auth/login", authHandler.Login)
+	mux.HandleFunc("POST /api/v1/auth/refresh", authHandler.Refresh)
+	mux.HandleFunc("POST /api/v1/auth/logout", authHandler.Logout)
+
+	mux.HandleFunc("GET /api/v1/users/{id}", userHandler.GetUser)
+	mux.HandleFunc("PATCH /api/v1/users/{id}", userHandler.RenameUser)
+	mux.HandleFunc("DELETE /api/v1/users/{id}", userHandler.DeleteUser)
+
 	mux.HandleFunc("GET /health", handler.Health)
 	mux.HandleFunc("POST /api/v1/products", productHandler.CreateProduct)
 	mux.HandleFunc("GET /api/v1/products", productHandler.GetAllProducts)
@@ -61,15 +74,9 @@ func main() {
 	mux.HandleFunc("PUT /api/v1/products/{id}", productHandler.UpdateProduct)
 	mux.HandleFunc("DELETE /api/v1/products/{id}", productHandler.DeleteProduct)
 
-	mux.HandleFunc("GET /api/v1/users/{id}", userHandler.GetUser)
-	mux.HandleFunc("PATCH /api/v1/users/{id}", userHandler.RenameUser)
-	mux.HandleFunc("DELETE /api/v1/users/{id}", userHandler.DeleteUser)
-
-	mux.HandleFunc("POST /api/v1/auth/register", authHandler.Register)
-	mux.HandleFunc("POST /api/v1/auth/login", authHandler.Login)
-	mux.HandleFunc("POST /api/v1/auth/refresh", authHandler.Refresh)
-	mux.HandleFunc("POST /api/v1/auth/logout", authHandler.Logout)
-
+	mux.HandleFunc("GET /api/v1/wallets/{id}", walletHandler.GetWallet)
+	mux.HandleFunc("POST /api/v1/wallets/{id}/topup", walletHandler.TopUp)
+	mux.HandleFunc("POST /api/v1/wallets/{id}/withdraw", walletHandler.Withdraw)
 
 
 	// Сервер
