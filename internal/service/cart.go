@@ -1,99 +1,123 @@
 package service
 
-// import (
-// 	"context"
+import (
+	"context"
+	"errors"
 
-// 	"github.com/vanchaooo/go-marketplace/internal/model"
-// 	"github.com/vanchaooo/go-marketplace/internal/repository"
-// )
+	"github.com/vanchaooo/go-marketplace/internal/model"
+	"github.com/vanchaooo/go-marketplace/internal/repository"
+)
 
-// type CartService struct {
-// 	users    *repository.UserRepository
-// 	carts    *repository.CartRepository
-// 	products *repository.ProductRepository
-// }
+type CartService struct {
+	users *repository.UserRepository
+	products *repository.ProductRepository
+	carts *repository.CartRepository
+}
 
-// func NewCartService(
-// 	users *repository.UserRepository,
-// 	carts *repository.CartRepository,
-// 	products *repository.ProductRepository,
-// ) *CartService {
-// 	return &CartService{users: users, carts: carts, products: products}
-// }
+func NewCartService(
+	users *repository.UserRepository,
+	products *repository.ProductRepository,
+	carts *repository.CartRepository,
+) *CartService {
+	return &CartService{
+		users: users,
+		products: products,
+		carts: carts,
+	}
+}
 
-// func (c *CartService) AddToCart(ctx context.Context, userID, productID, quantity int64) bool {
-// 	cart, ok := userCart(c.users, c.carts, userID)
-// 	if !ok {
-// 		return false
-// 	}
-// 	exist, err :=c.products.Exists(ctx, productID)
-// 	if err != nil {
-// 		return false
-// 	}
-// 	if !exist {
-// 		return false
-// 	}
-
-// 	return cart.Add(productID, quantity)
-// }
-
-// func (c *CartService) GetCart(userID int64) (model.Cart, bool) {
-// 	cart, ok := userCart(c.users, c.carts, userID)
-// 	if !ok {
-// 		return model.Cart{}, false
-// 	}
-
-// 	return cart.Copy(), true
-// }
-
-// func (c *CartService) UpdateQuantity(ctx context.Context, userID, productID, quantiry int64) bool {
-// 	cart, ok := userCart(c.users, c.carts, userID)
-// 	if !ok {
-// 		return false
-// 	}
-// 	exist, err :=c.products.Exists(ctx, productID)
-// 	if err != nil {
-// 		return false
-// 	}
-// 	if !exist {
-// 		return false
-// 	}
-// 	if _, ok := cart.Items[productID]; !ok {
-// 		return false
-// 	}
+func (c *CartService) AddToCart(ctx context.Context, userID, productID, quantity int64) (model.CartItem, error) {
+	if userID <= 0 {
+		return model.CartItem{}, ErrInvalidID
+	}
+	if productID <= 0 {
+		return model.CartItem{}, ErrInvalidID
+	}
+	if quantity <= 0 {
+		return model.CartItem{}, ErrInvalidQuantity
+	}
+	userExist, err := c.users.Exists(ctx, userID)
+	if err != nil {
+		return model.CartItem{}, err
+	}
+	if !userExist {
+		return model.CartItem{}, ErrUserNotFound
+	}
+	productExist, err := c.products.Exists(ctx, productID)
+	if err != nil {
+		return model.CartItem{}, err
+	}
+	if !productExist {
+		return model.CartItem{}, ErrProductNotFound
+	}
 	
-// 	return cart.SetQuantity(productID, quantiry)
-// }
+	cartItem, err := c.carts.Add(ctx, userID, productID, quantity)
+	if err != nil {
+		if errors.Is(err, repository.ErrProductNotFound) {
+			return model.CartItem{}, ErrProductNotFound
+		}
+		return model.CartItem{}, err
+	}
+	return cartItem, nil
+}
 
-// func (c *CartService) DeleteFromCart(userID, productID int64) bool {
-// 	cart, ok := userCart(c.users, c.carts, userID)
-// 	if !ok {
-// 		return false
-// 	}
-	
-// 	return cart.Remove(productID)
-// }
+func (c *CartService) ChangeQuantity(ctx context.Context, userID, productID, quantity int64) (model.CartItem, error) {
+	if userID <= 0 || productID <= 0 {
+		return model.CartItem{}, ErrInvalidID
+	}
+	if quantity <= 0 {
+		return model.CartItem{}, ErrInvalidQuantity
+	}
 
-// func (c *CartService) ClearCart(userID int64) bool {
-// 	cart, ok := userCart(c.users, c.carts, userID)
-// 	if !ok {
-// 		return false
-// 	}
+	cartItem, err := c.carts.SetQuantity(ctx, userID, productID, quantity)
+	if err != nil {
+		if errors.Is(err, repository.ErrCartItemNotFound) {
+			return model.CartItem{}, ErrCartItemNotFound
+		}
+		return model.CartItem{}, err
+	}
+	return cartItem, nil
+}
 
-// 	cart.Clear()
-// 	return true
-// }
+func (c *CartService) GetCart(ctx context.Context, userID int64) (model.Cart, error) {
+	if userID <= 0 {
+		return model.Cart{}, ErrInvalidID
+	}
+	userExist, err := c.users.Exists(ctx, userID)
+	if err != nil {
+		return model.Cart{}, err
+	}
+	if !userExist {
+		return model.Cart{}, ErrUserNotFound
+	}
 
-// func (c *CartService) CalculateCartTotal(ctx context.Context, userID int64) (int64, bool) {
-// 	cart, ok := userCart(c.users, c.carts, userID)
-// 	if !ok {
-// 		return 0, false
-// 	}
-	
-// 	items, ok := buildOrderItem(ctx, cart, c.products, false)
-// 	if !ok {
-// 		return 0, false
-// 	}
+	cart, err := c.carts.Get(ctx, userID)
+	if err != nil {
+		return model.Cart{}, err
+	}
+	return cart, nil
+}
 
-// 	return model.CalculateOrderTotal(items)
-// }
+func (c *CartService) DeleteItem(ctx context.Context, userID, productID int64) error {
+	if userID <= 0 {
+		return ErrInvalidID
+	}
+	if productID <= 0 {
+		return ErrInvalidID
+	}
+	userExist, err := c.users.Exists(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if !userExist {
+		return ErrUserNotFound
+	}
+
+	if err := c.carts.Delete(ctx, userID, productID); err != nil {
+		if errors.Is(err, repository.ErrCartItemNotFound) {
+			return ErrCartItemNotFound
+		}
+		return err
+	}
+	return nil
+}

@@ -25,6 +25,7 @@ var (
 	ErrInsufficientFunds = errors.New("недостаточно средств")
 	ErrAmountNegative = errors.New("сумма должна быть не менее 1 рубля")
 	ErrCartItemNotFound = errors.New("продукт не найден в корзине")
+	ErrInvalidQuantity = errors.New("количество должно быть не менее 1 штуки")
 )
 
 // func userCart(

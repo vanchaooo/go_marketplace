@@ -110,3 +110,18 @@ func (c *CartRepository) Delete(ctx context.Context, userID, productID int64) er
 	}
 	return nil
 }
+
+func (c *CartRepository) Exists(ctx context.Context, userID, productID int64) (bool, error) {
+	const query = `
+		SELECT EXISTS (
+			SELECT product_id
+			FROM cart_items
+			WHERE user_id = $1 AND product_id = $2
+		)
+	`
+	var exist bool
+	if err := c.pool.QueryRow(ctx, query, userID, productID).Scan(&exist); err != nil {
+		return false, err
+	}
+	return exist, nil
+}
