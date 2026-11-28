@@ -1,11 +1,11 @@
 package service
 
 import (
-	"context"
+	// "context"
 	"errors"
-	"sort"
-	"github.com/vanchaooo/go-marketplace/internal/model"
-	"github.com/vanchaooo/go-marketplace/internal/repository"
+	// "sort"
+	// "github.com/vanchaooo/go-marketplace/internal/model"
+	// "github.com/vanchaooo/go-marketplace/internal/repository"
 )
 
 var (
@@ -24,51 +24,52 @@ var (
 	ErrWalletNotFound = errors.New("кошелек не найден")
 	ErrInsufficientFunds = errors.New("недостаточно средств")
 	ErrAmountNegative = errors.New("сумма должна быть не менее 1 рубля")
+	ErrCartItemNotFound = errors.New("продукт не найден в корзине")
 )
 
-func userCart(
-	ctx context.Context,
-	users *repository.UserRepository,
-	carts *repository.CartRepository,
-	userID int64,
-) (*model.Cart, bool) {
-	exist, err := users.Exists(ctx, userID)
-	if err != nil {
-		return &model.Cart{}, false
-	}
-	if !exist {
-		return &model.Cart{}, false
-	}
+// func userCart(
+// 	ctx context.Context,
+// 	users *repository.UserRepository,
+// 	carts *repository.CartRepository,
+// 	userID int64,
+// ) (*model.Cart, bool) {
+// 	exist, err := users.Exists(ctx, userID)
+// 	if err != nil {
+// 		return &model.Cart{}, false
+// 	}
+// 	if !exist {
+// 		return &model.Cart{}, false
+// 	}
  
-	return carts.Get(userID)
-}
+// 	return carts.Get(userID)
+// }
 
-func buildOrderItem(
-	ctx context.Context,
-	cart *model.Cart,
-	products *repository.ProductRepository,
-	stock bool,
-) ([]model.OrderItem, bool) {
-	items := make([]model.OrderItem, 0, len(cart.Items))
+// func buildOrderItem(
+// 	ctx context.Context,
+// 	cart *model.Cart,
+// 	products *repository.ProductRepository,
+// 	stock bool,
+// ) ([]model.OrderItem, bool) {
+// 	items := make([]model.OrderItem, 0, len(cart.Items))
 
-	for productID, quantity := range cart.Items {
-		product, err := products.Get(ctx, productID)
-		if err != nil {
-			return nil, false
-		}
-		if stock && !product.IsAvailable(quantity) {
-			return nil, false
-		}
+// 	for productID, quantity := range cart.Items {
+// 		product, err := products.Get(ctx, productID)
+// 		if err != nil {
+// 			return nil, false
+// 		}
+// 		if stock && !product.IsAvailable(quantity) {
+// 			return nil, false
+// 		}
 
-		item, ok := model.NewOrderItem(product, quantity)
-		if !ok {
-			return nil, false
-		}
-		items = append(items, item)
-	}
+// 		item, ok := model.NewOrderItem(product, quantity)
+// 		if !ok {
+// 			return nil, false
+// 		}
+// 		items = append(items, item)
+// 	}
 
-	sort.Slice(items, func(i, j int) bool {
-		return items[i].ProductID < items[j].ProductID
-	})
-	return items, true
-}
+// 	sort.Slice(items, func(i, j int) bool {
+// 		return items[i].ProductID < items[j].ProductID
+// 	})
+// 	return items, true
+// }

@@ -20,9 +20,16 @@ type Wallet struct {
 	Balance int64
 }
 
+type CartItem struct {
+	ProductID int64
+	Name string
+	Quantity int64
+	Price int64
+}
+
 type Cart struct {
 	UserID int64
-	Items map[int64]int64 // ID товара - Кол-во
+	Items []CartItem
 }
 
 type Product struct {

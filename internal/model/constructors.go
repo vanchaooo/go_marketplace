@@ -52,13 +52,13 @@ func NewProduct(productID int64, name string, price int64, stock int64) (Product
 	return Product{ID: productID, Name: name, Price: price, Stock: stock}, true
 }
  
-func NewCart(userID int64) (Cart, bool) {
-	if userID <= 0 {
-		return Cart{}, false
-	}
+// func NewCart(userID int64) (Cart, bool) {
+// 	if userID <= 0 {
+// 		return Cart{}, false
+// 	}
  
-	return Cart{UserID: userID, Items: make(map[int64]int64)}, true
-}
+// 	return Cart{UserID: userID, Items: make(map[int64]int64)}, true
+// }
  
 func isValidOrderItem(item OrderItem) bool {
 	return item.ProductID > 0 && item.Price > 0 && item.Quantity > 0 && item.ProductName != ""

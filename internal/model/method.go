@@ -104,61 +104,61 @@ func (p *Product) Reserve(quantity int64) bool {
 
 // Cart
 
-func (c Cart) IsEmpty() bool {
-	return len(c.Items) == 0
-}
+// func (c Cart) IsEmpty() bool {
+// 	return len(c.Items) == 0
+// }
 
-func (c *Cart) Add(productID int64, quantity int64) bool {
-	if productID <= 0 || quantity <= 0 {
-		return false
-	}
-	if c.Items == nil {
-		c.Items = make(map[int64]int64)
-	}
+// func (c *Cart) Add(productID int64, quantity int64) bool {
+// 	if productID <= 0 || quantity <= 0 {
+// 		return false
+// 	}
+// 	if c.Items == nil {
+// 		c.Items = make(map[int64]int64)
+// 	}
 
-	c.Items[productID] += quantity
-	return true
-}
+// 	c.Items[productID] += quantity
+// 	return true
+// }
 
-func (c *Cart) SetQuantity(productID int64, quantity int64) bool {
-	if productID <= 0 || quantity < 0 {
-		return false
-	}
+// func (c *Cart) SetQuantity(productID int64, quantity int64) bool {
+// 	if productID <= 0 || quantity < 0 {
+// 		return false
+// 	}
 
-	if quantity == 0 {
-		delete(c.Items, productID)
-		return true
-	}
+// 	if quantity == 0 {
+// 		delete(c.Items, productID)
+// 		return true
+// 	}
 
-	if c.Items == nil {
-		c.Items = make(map[int64]int64)
-	}
-	c.Items[productID] = quantity
-	return true
-}
+// 	if c.Items == nil {
+// 		c.Items = make(map[int64]int64)
+// 	}
+// 	c.Items[productID] = quantity
+// 	return true
+// }
 
-func (c *Cart) Remove(productID int64) bool {
-	_, exists := c.Items[productID]
-	if !exists {
-		return false
-	}
+// func (c *Cart) Remove(productID int64) bool {
+// 	_, exists := c.Items[productID]
+// 	if !exists {
+// 		return false
+// 	}
 
-	delete(c.Items, productID)
-	return true
-}
+// 	delete(c.Items, productID)
+// 	return true
+// }
 
-func (c *Cart) Clear() {
-	c.Items = make(map[int64]int64)
-}
+// func (c *Cart) Clear() {
+// 	c.Items = make(map[int64]int64)
+// }
 
-func (c Cart) Copy() Cart {
-	itemsCopy := make(map[int64]int64, len(c.Items))
-	for productID, quantity := range c.Items {
-		itemsCopy[productID] = quantity
-	}
+// func (c Cart) Copy() Cart {
+// 	itemsCopy := make(map[int64]int64, len(c.Items))
+// 	for productID, quantity := range c.Items {
+// 		itemsCopy[productID] = quantity
+// 	}
 
-	return Cart{UserID: c.UserID, Items: itemsCopy}
-}
+// 	return Cart{UserID: c.UserID, Items: itemsCopy}
+// }
 
 
 
